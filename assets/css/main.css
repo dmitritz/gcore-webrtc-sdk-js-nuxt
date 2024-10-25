@@ -16,3 +16,8 @@ a {
     @apply text-orange-950 hover:text-orange-950;
   }
 } */
+
+label {
+  @apply text-slate-600;
+  font-weight: bold;
+}

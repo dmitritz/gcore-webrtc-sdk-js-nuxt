@@ -1,7 +1,4 @@
 import {
-  type Ref,
-  readonly,
-  ref,
   watch,
 } from 'vue'
 
@@ -10,7 +7,7 @@ export type DeviceInfo = {
   deviceId: string
 }
 
-const VIDEORES: Record<
+export const VIDEORES: Record<
   string,
   { width: number; height: number }
 > = {
@@ -35,6 +32,8 @@ const VIDEORES: Record<
     height: 240,
   },
 }
+
+export const VIDEORES_DEFAULT = '1080p'
 
 export default () => {
   const state = useState<{
@@ -61,7 +60,7 @@ export default () => {
       willUseMic: false,
       pending: false,
       videoConstraints: {
-        ...VIDEORES['1080p'],
+        ...VIDEORES[VIDEORES_DEFAULT],
       },
     }
   })

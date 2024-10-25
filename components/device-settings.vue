@@ -52,5 +52,6 @@ const deviceNo = computed(() => {
         {{ device.label || `${props.label} ${deviceNo[device.deviceId]}` }}
       </option>
     </select>
+    <slot />
   </div>
 </template>
