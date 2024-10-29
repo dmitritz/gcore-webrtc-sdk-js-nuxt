@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@gcorevideo/rtckit": "^0.65.1",
-    "@gcorevideo/rtckit-node": "^0.10.0",
+    "@gcorevideo/rtckit-node": "^0.10.1",
     "@heroicons/vue": "^2.1.5",
     "nuxt": "^3.12.4",
     "vue": "latest"
