@@ -11,8 +11,8 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@gcorevideo/rtckit": "^0.64.3",
-    "@gcorevideo/rtckit-node": "^0.9.0",
+    "@gcorevideo/rtckit": "^0.65.1",
+    "@gcorevideo/rtckit-node": "^0.10.0",
     "@heroicons/vue": "^2.1.5",
     "nuxt": "^3.12.4",
     "vue": "latest"
