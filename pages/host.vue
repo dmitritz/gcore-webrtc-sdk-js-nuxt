@@ -20,7 +20,7 @@ const userMedia = useUserMedia((sum: () => void) => {
 const canStart = computed(
   () =>
     userMedia.value.videoTrack &&
-    userMedia.value.audioTrack &&
+    // userMedia.value.audioTrack &&
     !started.value,
 )
 const started = computed(() => air.value.live || air.value.ended)
