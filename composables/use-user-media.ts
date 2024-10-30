@@ -2,7 +2,7 @@ import { watch } from 'vue'
 
 import { type WebrtcStreamParams } from "@gcorevideo/rtckit";
 
-import useWebrtcStreaming from './use-webrtc-streaming'
+import useWebrtcStreaming from './use-webrtc-streaming.js'
 
 function useUserMedia(cb?: (start: () => void) => void) {
   const webrtcStreaming = useWebrtcStreaming()
