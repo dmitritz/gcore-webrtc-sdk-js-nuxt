@@ -1,7 +1,8 @@
 import {
   watch,
 } from 'vue'
-import useWebrtcStreaming from './use-webrtc-streaming.js'
+
+import useWebrtcStreaming from '~/composables/use-webrtc-streaming'
 
 export type DeviceInfo = {
   label: string
