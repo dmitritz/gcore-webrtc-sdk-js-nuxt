@@ -1,30 +1,11 @@
 <script setup lang="ts">
-import useMediaDevices, {VIDEORES, VIDEORES_DEFAULT} from '~/composables/use-media-devices'
+import useMediaDevices, { type VideoResoultion } from '~/composables/use-media-devices'
 import useUserMedia from '~/composables/use-user-media'
-
-const VIDEORES_LABELS = Object.fromEntries(
-  Object.entries(VIDEORES).map(([k, { width, height}]) => [k, `${width}x${height}`])
-)
-const VIDEORES_ITEMS = Object.keys(VIDEORES)
 
 const air = useAir()
 
 const mediaDevices = useMediaDevices()
 const userMedia = useUserMedia()
-const videores = ref(VIDEORES_DEFAULT)
-const deviceId = ref('')
-
-watch([deviceId, videores], updateMediaDevices)
-
-function updateMediaDevices() {
-  mediaDevices.value.cameraDeviceId = deviceId.value
-  mediaDevices.value.willUseCamera =
-    true
-  mediaDevices.value.videoConstraints = {
-    width: VIDEORES[videores.value].width,
-    height: VIDEORES[videores.value].height,
-  }
-}
 
 function onToggle() {
   if (air.value.live) {
@@ -51,25 +32,26 @@ function onToggle() {
     :disabled="air.ended"
     :readonly="air.live"
     label="Camera"
-    @change="devId => deviceId = devId"
+    @change="devId => mediaDevices.cameraDeviceId = devId"
     @toggle="onToggle"
   >
     <span>
       <label for="videores">resolution</label>
       <select
-        v-model="videores"
+        v-model="mediaDevices.resolution"
         :disabled="air.ended || !mediaDevices.willUseCamera || air.live"
         id="videores"
       >
+        <option value key="0" disabled>Default</option>
         <option
-          v-for="vres of VIDEORES_ITEMS"
-          :key="vres"
-          :value="vres"
+          v-for="vres of mediaDevices.resolutions"
+          :key="vres.height"
+          :value="vres.height"
           :selected="
-            videores === vres
+            mediaDevices.resolution === vres.height
           "
         >
-          {{ VIDEORES_LABELS[vres] }}
+          {{ vres.width }}×{{ vres.height }}
         </option>
       </select>
     </span>

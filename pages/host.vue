@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { WhipClient } from '@gcorevideo/rtckit/lib/whip'
 
 definePageMeta({
   middleware: 'auth',
@@ -9,12 +8,15 @@ const iceServers = useIceServers()
 
 const mediaDevices = useMediaDevices()
 const stream = await useStream()
-
-let whipClient: WhipClient | null = null
+const webrtcStreaming = useWebrtcStreaming()
 
 const air = useAir()
 
-const userMedia = useUserMedia()
+let startUserMedia: () => void
+
+const userMedia = useUserMedia((sum: () => void) => {
+  startUserMedia = sum // TODO call startUserMedia
+})
 const canStart = computed(
   () =>
     userMedia.value.videoTrack &&
@@ -23,31 +25,26 @@ const canStart = computed(
 )
 const started = computed(() => air.value.live || air.value.ended)
 
+onMounted(() => startUserMedia())
+
 function start() {
   const s = userMedia.value.stream
   if (!s) {
     return
   }
   air.value.live = true
-  if (!whipClient) {
-    whipClient = new WhipClient(
-      stream.whipEndpoint,
-      {
-        videoCodecs: ['H264'],
-        iceServers: iceServers.value,
-      },
-    )
-    whipClient.start(s)
-  }
+
+  webrtcStreaming.configure(stream.whipEndpoint,
+  {
+    videoCodecs: ['H264'],
+    iceServers: iceServers.value,
+  }).run()
 }
 
 function leave() {
   air.value.live = false
   air.value.ended = true
-  if (whipClient) {
-    whipClient.close()
-    whipClient = null
-  }
+  webrtcStreaming.close()
   if (userMedia.value.stream) {
     closeMediaStream(
       userMedia.value.stream,

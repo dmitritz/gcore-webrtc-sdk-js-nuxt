@@ -1,6 +1,11 @@
 import { watch } from 'vue'
 
-export default function useUserMedia() {
+import { type WebrtcStreamParams } from "@gcorevideo/rtckit";
+
+import useWebrtcStreaming from './use-webrtc-streaming'
+
+function useUserMedia(cb?: (start: () => void) => void) {
+  const webrtcStreaming = useWebrtcStreaming()
   const mediaDevices = useMediaDevices()
   const state = useState<{
     audioTrack: MediaStreamTrack | null
@@ -8,7 +13,7 @@ export default function useUserMedia() {
     error: string
     micEnabled: boolean
     stream: MediaStream | null
-    videoTrack: MediaStreamTrack | null
+    videoTrack: MediaStreamTrack | null,
   }>('userMedia', () => ({
     audioTrack: null,
     cameraEnabled: true,
@@ -17,52 +22,40 @@ export default function useUserMedia() {
     stream: null,
     videoTrack: null,
   }))
-  const constraints = computed(() => ({
-    audio: mediaDevices.value.willUseMic
-      ? mediaDevices.value.micDeviceId
-        ? {
-            deviceId: {
-              exact:
-                mediaDevices.value
-                  .micDeviceId,
-            },
-          }
-        : true
-      : false,
-    video: mediaDevices.value
-      .willUseCamera
-      ? buildVideoConstraints(
-          mediaDevices.value
-            .cameraDeviceId ||
-            mediaDevices.value
-              .cameraDevicesList[0]
-              ?.deviceId,
-          mediaDevices.value
-            .videoConstraints,
-        )
-      : false,
-  }))
+  const constraints: ComputedRef<WebrtcStreamParams> = computed(() => {
+    const params: WebrtcStreamParams = {
+      audio: false,
+      video: false,
+    };
+    if (mediaDevices.value.willUseMic) {
+      params.audio = mediaDevices.value.micDeviceId || true;
+    }
+    if (mediaDevices.value.willUseCamera) {
+      params.video = mediaDevices.value.cameraDeviceId || mediaDevices.value.cameraDevicesList[0]?.deviceId || false
+      if (mediaDevices.value.resolution) {
+        params.resolution = mediaDevices.value.resolution
+      }
+    }
+    return params
+  })
   watch(
     () => foldConstraints(constraints.value),
-    async () => {
+    async (v: string) => {
       closeTracks()
       if (
         constraints.value.audio ===
-          false &&
+        false &&
         constraints.value.video ===
-          false
+        false
       ) {
         return
       }
       try {
         const s =
-          await navigator.mediaDevices.getUserMedia(
-            constraints.value,
-          )
+          await webrtcStreaming.get().openSourceStream(constraints.value)
         state.value.stream = s
-        await updateDevicesList()
         s.getTracks().forEach(
-          (track) => {
+          (track: MediaStreamTrack) => {
             if (
               track.kind === 'audio'
             ) {
@@ -101,7 +94,6 @@ export default function useUserMedia() {
           },
         )
       } catch (e) {
-        // TODO
         state.value.error = String(e)
       }
     },
@@ -125,8 +117,15 @@ export default function useUserMedia() {
     },
   )
 
-  // TODO readonly?
+  if (cb) {
+    // TODO setTimeout/nextTick
+    cb(start)
+  }
   return state
+
+  function start() {
+    updateDevicesList()
+  }
 
   function closeTracks() {
     const s = state.value.stream
@@ -142,179 +141,30 @@ export default function useUserMedia() {
   }
 
   async function updateDevicesList() {
-    const devices =
-      await navigator.mediaDevices.enumerateDevices()
-    mediaDevices.value.cameraDevicesList =
-      devices
-        .filter(
-          (d) =>
-            d.kind === 'videoinput',
-        )
-        .map((d, i) => ({
-          deviceId: d.deviceId,
-          label:
-            d.label ||
-            `Camera ${i + 1}`,
-          groupId: d.groupId,
-        }))
+    const md = webrtcStreaming.get().mediaDevices
+    mediaDevices.value.cameraDevicesList = await md
+      .getCameras()
+      .then(items => items.map((d, i) => ({
+        deviceId: d.deviceId,
+        label:
+          d.label ||
+          `Camera ${i + 1}`,
+        groupId: d.groupId,
+      })))
     mediaDevices.value.micDevicesList =
-      devices
-        .filter(
-          (d) =>
-            d.kind === 'audioinput',
-        )
-        .map((d, i) => ({
+      await webrtcStreaming.get().mediaDevices.getMicrophones()
+        .then(items => items.map((d, i) => ({
           deviceId: d.deviceId,
           label:
             d.label ||
             `Microphone ${i + 1}`,
           groupId: d.groupId,
-        }))
+        })))
   }
 }
 
-function buildVideoConstraints(
-  deviceId: string,
-  constraints: MediaTrackConstraintSet,
-): MediaTrackConstraintSet {
-  const constr: MediaTrackConstraintSet =
-    { ...constraints }
-  if (deviceId) {
-    constr.deviceId = {
-      exact: deviceId,
-    }
-  }
-  return constr
-}
+export default useUserMedia
 
-type VideoConstraints = {
-  deviceId?: string
-  width?: number
-  height?: number
+function foldConstraints(c: WebrtcStreamParams) {
+  return `audio:${c.audio};video:${c.video};resolution:${c.resolution}`
 }
-
-type AudioContraints = {
-  deviceId?: string
-}
-
-function foldVideoConstraints(
-  c: MediaTrackConstraintSet | boolean,
-): string {
-  if (typeof c === 'boolean') {
-    return String(c)
-  }
-  const s = []
-  if (c.deviceId) {
-    s.push(
-      `deviceId=${foldStringContraint(
-        c.deviceId,
-      )}`,
-    )
-  }
-  if (c.width) {
-    s.push(
-      `width=${foldNumericConstraint(
-        c.width,
-      )}`,
-    )
-  }
-  if (c.height) {
-    s.push(
-      `height=${foldNumericConstraint(
-        c.height,
-      )}`,
-    )
-  }
-  return s.join('/') || 'true'
-}
-
-function foldAudioConstraints(
-  c: MediaTrackConstraintSet | boolean,
-) {
-  if (typeof c === 'boolean') {
-    return String(c)
-  }
-  const s = []
-  if (c.deviceId) {
-    s.push(
-      `deviceId=${foldStringContraint(
-        c.deviceId,
-      )}`,
-    )
-  }
-  return s.join('/') || 'true'
-}
-
-function foldNumericConstraint(
-  c: ConstrainULong,
-): string {
-  if (typeof c === 'number') {
-    return String(c)
-  }
-  // if (c.exact) {
-  //   return c.exact
-  // }
-  if (c.ideal) {
-    return String(c.ideal)
-  }
-  // TODO min, max?
-  return ''
-}
-
-function foldStringContraint(
-  c: ConstrainDOMString,
-): string | boolean {
-  if (typeof c === 'string') {
-    return c
-  }
-  if (Array.isArray(c)) {
-    return c[0] || ''
-  }
-  if (c.exact) {
-    return fromMultiString(c.exact)
-  }
-  return false
-}
-
-function fromMultiString(
-  c: string | string[],
-): string | boolean {
-  return typeof c === 'string'
-    ? c
-    : c.join(',')
-}
-
-function foldConstraints(c: {
-  audio: MediaTrackConstraintSet | boolean
-  video: MediaTrackConstraintSet | boolean
-}) {
-  return `audio:${foldAudioConstraints(
-    c.audio,
-  )}; video:${foldVideoConstraints(c.video)}`
-}
-
-// function sameConstraints(
-//   a: {
-//     video:
-//       | boolean
-//       | MediaTrackConstraintSet
-//     audio:
-//       | boolean
-//       | MediaTrackConstraintSet
-//   },
-//   b: {
-//     video:
-//       | boolean
-//       | MediaTrackConstraintSet
-//     audio:
-//       | boolean
-//       | MediaTrackConstraintSet
-//   },
-// ) {
-//   return (
-//     foldVideoConstraints(a.video) ===
-//       foldVideoConstraints(b.video) &&
-//     foldAudioConstraints(a.audio) ===
-//       foldAudioConstraints(b.audio)
-//   )
-// }
