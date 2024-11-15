@@ -1,6 +1,12 @@
-import { WebrtcStreaming, type WhipClientOptions } from "@gcorevideo/rtckit";
+import { StreamMeta, WebrtcStreaming, type WhipClientOptions } from "@gcorevideo/rtckit";
 
 let webrtc: WebrtcStreaming | null = null
+
+const baseOptions = {
+  plugins: [
+    new StreamMeta(),
+  ]
+}
 
 function useWebrtcStreaming() {
   return {
@@ -12,7 +18,8 @@ function useWebrtcStreaming() {
     },
     configure(endpoint: string, options?: WhipClientOptions): WebrtcStreaming {
       const w = this.get()
-      w.configure(endpoint, options)
+      const opts = options ? { ...baseOptions, ...options } : baseOptions
+      w.configure(endpoint, opts)
       return w
     },
     get(): WebrtcStreaming {

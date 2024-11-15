@@ -4,8 +4,6 @@ definePageMeta({
   middleware: 'auth',
 })
 
-const iceServers = useIceServers()
-
 const mediaDevices = useMediaDevices()
 const stream = await useStream()
 const webrtcStreaming = useWebrtcStreaming()
@@ -36,8 +34,8 @@ function start() {
 
   webrtcStreaming.configure(stream.whipEndpoint,
   {
+    hotReplace: true,
     videoCodecs: ['H264'],
-    iceServers: iceServers.value,
   }).run()
 }
 

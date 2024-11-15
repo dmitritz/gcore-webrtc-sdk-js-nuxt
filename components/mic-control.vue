@@ -35,7 +35,6 @@ function onToggle() {
     "
     :disabled="air.ended"
     label="Microphone"
-    :readonly="air.live"
     @change="onChange"
     @toggle="onToggle"
   />

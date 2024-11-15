@@ -30,7 +30,6 @@ function onToggle() {
       mediaDevices.cameraDevicesList
     "
     :disabled="air.ended"
-    :readonly="air.live"
     label="Camera"
     @change="devId => mediaDevices.cameraDeviceId = devId"
     @toggle="onToggle"
