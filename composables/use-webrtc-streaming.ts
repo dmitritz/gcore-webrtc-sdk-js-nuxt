@@ -3,6 +3,7 @@ import { StreamMeta, WebrtcStreaming, type WhipClientOptions } from "@gcorevideo
 let webrtc: WebrtcStreaming | null = null
 
 const baseOptions = {
+  mediaDevicesAutoSelect: true,
   plugins: [
     new StreamMeta(),
   ]
