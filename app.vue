@@ -2,6 +2,7 @@
 import pkg from './package.json' with { type: 'json' }
 import rtckit from '@gcorevideo/rtckit/package.json' with { type: 'json' }
 import rtckitNode from '@gcorevideo/rtckit-node/package.json' with { type: 'json' }
+import { LogTracer, Logger, setTracer } from "@gcorevideo/rtckit";
 
 if (typeof window !== 'undefined') {
   console.log(
@@ -11,6 +12,8 @@ if (typeof window !== 'undefined') {
     rtckit.version,
     rtckitNode.version,
   )
+  Logger.enable('*')
+  setTracer(new LogTracer())
 }
 </script>
 

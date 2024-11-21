@@ -1,12 +1,26 @@
 <script setup lang="ts">
+import { WebrtcStreamingEvents } from "@gcorevideo/rtckit";
+
 import useMediaDevices from '~/composables/use-media-devices'
 import useUserMedia from '~/composables/use-user-media'
+import useWebrtcStreaming from '~/composables/use-webrtc-streaming';
 
 const mediaDevices = useMediaDevices()
 
 const userMedia = useUserMedia()
 
 const air = useAir()
+
+const webrtcStreaming = useWebrtcStreaming().get();
+
+webrtcStreaming.on(WebrtcStreamingEvents.MediaDeviceSwitch, (e) => {
+  if (!mediaDevices.value.willUseMic || air.value.ended) {
+    return
+  }
+  if (e.kind === "audio") {
+    mediaDevices.value.micDeviceId = e.device.deviceId
+  }
+})
 
 function onChange(id: string) {
   mediaDevices.value.micDeviceId = id

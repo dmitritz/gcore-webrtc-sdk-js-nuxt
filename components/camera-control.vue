@@ -1,11 +1,24 @@
 <script setup lang="ts">
-import useMediaDevices, { type VideoResoultion } from '~/composables/use-media-devices'
+import { WebrtcStreamingEvents } from "@gcorevideo/rtckit";
+
+import useMediaDevices from '~/composables/use-media-devices'
 import useUserMedia from '~/composables/use-user-media'
+import useWebrtcStreaming from '~/composables/use-webrtc-streaming';
 
 const air = useAir()
 
 const mediaDevices = useMediaDevices()
 const userMedia = useUserMedia()
+const webrtcStreaming = useWebrtcStreaming().get();
+
+webrtcStreaming.on(WebrtcStreamingEvents.MediaDeviceSwitch, (e) => {
+  if (!mediaDevices.value.willUseCamera || air.value.ended) {
+    return
+  }
+  if (e.kind === "video") {
+    mediaDevices.value.cameraDeviceId = e.device.deviceId
+  }
+})
 
 function onToggle() {
   if (air.value.live) {
