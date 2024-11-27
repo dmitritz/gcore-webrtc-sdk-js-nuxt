@@ -1,19 +1,20 @@
 {
-  "name": "nuxt-app",
+  "name": "gcore-webrtc-ingest-demo-vercel",
   "private": true,
   "type": "module",
   "version": "0.1.0",
   "scripts": {
-    "build": "nuxt build",
+    "build": "VITE_SENTRY_BUILD_ID=$VERCEL_GIT_COMMIT_SHA nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@gcorevideo/rtckit": "^0.76.3",
+    "@gcorevideo/rtckit": "^0.77.0",
     "@gcorevideo/rtckit-node": "^0.10.3",
     "@heroicons/vue": "^2.1.5",
+    "@sentry/browser": "^8.40.0",
     "nuxt": "^3.12.4",
     "vue": "latest"
   },
