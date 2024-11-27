@@ -17,7 +17,6 @@ if (typeof window !== 'undefined') {
     release: rtckit.version,
     tracesSampleRate: 1.0,
   })
-  console.log("Sentry env %s %s %s", import.meta.env.VITE_SENTRY_DSN, import.meta.env.VITE_SENTRY_ENV, import.meta.env.VITE_SENTRY_BUILD_ID)
   setTracer(new SentryTracer(Sentry))
   console.log(
     '%s %s/rtckit %s %s ',
