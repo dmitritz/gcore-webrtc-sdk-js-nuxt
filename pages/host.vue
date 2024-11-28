@@ -43,7 +43,7 @@ function start() {
 
   const w = webrtcStreaming.configure(stream.whipEndpoint,
   {
-    hotReplace: true,
+    debug: true,
     icePreferTcp: true,
     iceTransportPolicy: 'relay',
     mediaDevicesAutoSwitch: true,
