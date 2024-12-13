@@ -3,6 +3,7 @@ import {
 } from 'vue'
 
 import useWebrtcStreaming from './use-webrtc-streaming.js'
+import { WebrtcStreamingEvents } from '@gcorevideo/rtckit'
 
 export type DeviceInfo = {
   label: string
@@ -56,36 +57,17 @@ export default () => {
     pending: boolean
     resolutions: VideoResoultion[]
     resolution: number
-  }>("mediaDevices", () => {
-    return {
-      cameraDevicesList: [],
-      cameraDeviceId: '',
-      error: '',
-      micDevicesList: [],
-      micDeviceId: '',
-      willUseCamera: false,
-      willUseMic: false,
-      pending: false,
-      resolutions: [],
-      resolution: VIDEORES_DEFAULT,
-    }
-  })
-  watch(() => state.value.micDeviceId, (val) => {
-    // TODO
-  })
-  watch(() => state.value.cameraDeviceId, (val) => {
-    if (val) {
-      const r = webrtcStreaming.get().mediaDevices.getAvailableVideoResolutions(val)
-      state.value.resolutions = r
-    } else {
-      state.value.resolutions = []
-    }
-  })
-  watch(() => state.value.cameraDevicesList, (val) => {
-    if (val.length && !state.value.cameraDeviceId) {
-      state.value.cameraDeviceId = val[0].deviceId
-    }
-  })
-  // TODO watch the rest
+  }>("mediaDevices", () => ({
+    cameraDevicesList: [],
+    cameraDeviceId: '',
+    error: '',
+    micDevicesList: [],
+    micDeviceId: '',
+    willUseCamera: true,
+    willUseMic: true,
+    pending: false,
+    resolutions: [],
+    resolution: VIDEORES_DEFAULT,
+  }))
   return state;
 }

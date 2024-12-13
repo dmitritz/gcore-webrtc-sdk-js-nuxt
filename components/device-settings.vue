@@ -32,13 +32,14 @@ const deviceNo = computed(() => {
       <input
         type="checkbox"
         @change="$emit('toggle', !checked)"
-        :disabled="disabled"
+        :disabled="disabled || devicesList.length === 0"
+        :checked="checked && devicesList.length > 0"
       />
       {{ label.substring(0, 1).toUpperCase() + label.substring(1) }}
     </label>
     <select
       @change="(e) => $emit('change', (e.target as HTMLSelectElement).value)"
-      :disabled="disabled || !checked || readonly"
+      :disabled="disabled || !checked || readonly || devicesList.length === 0"
     >
       <option v-if="!devicesList.length" disabled selected>No {{ label }}</option>
       <option

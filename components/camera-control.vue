@@ -9,9 +9,55 @@ const air = useAir()
 
 const mediaDevices = useMediaDevices()
 const userMedia = useUserMedia()
-const webrtcStreaming = useWebrtcStreaming().get();
+const webrtc = useWebrtcStreaming().get();
+const mediaDevicesList = useMediaDevicesList()
 
-webrtcStreaming.on(WebrtcStreamingEvents.MediaDeviceSwitch, (e) => {
+watch(() => mediaDevices.value.cameraDeviceId, (val) => {
+  if (val) {
+    const r = webrtc.mediaDevices.getAvailableVideoResolutions(val)
+    mediaDevices.value.resolutions = r
+  } else {
+    mediaDevices.value.resolutions = []
+  }
+})
+
+watch(() => mediaDevices.value.cameraDevicesList, (val) => {
+  if (val.length && !mediaDevices.value.cameraDeviceId) {
+    mediaDevices.value.cameraDeviceId = val[0].deviceId
+  }
+})
+
+watch(
+  () => userMedia.value.cameraEnabled,
+  (val) => {
+    webrtc.toggleVideo(val)
+  },
+  {
+    immediate: true,
+  }
+)
+
+watch(() => userMedia.value.stream,
+  (val) => {
+    if (!val) {
+      return;
+    }
+    const tracks = val.getVideoTracks()
+    if (!tracks.length) {
+      return;
+    }
+    const { height } = tracks[0].getSettings()
+    if (height) {
+      mediaDevices.value.resolution = height;
+    }
+  }
+)
+
+onMounted(() => {
+  mediaDevicesList.updateCameras();
+})
+
+webrtc.on(WebrtcStreamingEvents.MediaDeviceSelect, (e) => {
   if (!mediaDevices.value.willUseCamera || air.value.ended) {
     return
   }
@@ -21,48 +67,21 @@ webrtcStreaming.on(WebrtcStreamingEvents.MediaDeviceSwitch, (e) => {
 })
 
 function onToggle() {
-  if (air.value.live) {
-    userMedia.value.cameraEnabled =
-      !userMedia.value.cameraEnabled
-  } else {
-    mediaDevices.value.willUseCamera =
-      !mediaDevices.value.willUseCamera
-  }
+  userMedia.value.cameraEnabled =
+    !userMedia.value.cameraEnabled
 }
 </script>
 
 <template>
-  <device-settings
-    :checked="
-      mediaDevices.willUseCamera
-    "
-    :device-id="
-      mediaDevices.cameraDeviceId
-    "
-    :devices-list="
-      mediaDevices.cameraDevicesList
-    "
-    :disabled="air.ended"
-    label="Camera"
-    @change="devId => mediaDevices.cameraDeviceId = devId"
-    @toggle="onToggle"
-  >
+  <device-settings :checked="userMedia.cameraEnabled" :device-id="mediaDevices.cameraDeviceId"
+    :devices-list="mediaDevices.cameraDevicesList" :disabled="air.ended" label="Camera"
+    @change="v => mediaDevices.cameraDeviceId = v" @toggle="onToggle">
     <span>
-      <label for="videores">resolution</label>
-      <select
-        v-model="mediaDevices.resolution"
-        :disabled="air.ended || !mediaDevices.willUseCamera || air.live"
-        id="videores"
-      >
+      <label for="videores">quality</label>
+      <select v-model="mediaDevices.resolution" :disabled="air.ended || !mediaDevices.willUseCamera || air.live"
+        id="videores">
         <option value key="0" disabled>Default</option>
-        <option
-          v-for="vres of mediaDevices.resolutions"
-          :key="vres.height"
-          :value="vres.height"
-          :selected="
-            mediaDevices.resolution === vres.height
-          "
-        >
+        <option v-for="vres of mediaDevices.resolutions" :key="vres.height" :value="vres.height">
           {{ vres.width }}×{{ vres.height }}
         </option>
       </select>

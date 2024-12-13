@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { version as rtckitver } from "@gcorevideo/rtckit";
+
 const air = useAir()
 const auth = useAuth()
 const route = useRoute()
@@ -73,6 +75,9 @@ const locked = computed(
           alt="Opus logo"
           class="basis-1/2 w-1/2 max-w-24"
         />
+      </div>
+      <div class="text-end text-slate-700 text-sm">
+        <p>rtckit <b>{{ rtckitver }}</b></p>
       </div>
     </footer>
   </div>

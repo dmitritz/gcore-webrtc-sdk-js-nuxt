@@ -6,20 +6,44 @@ import useUserMedia from '~/composables/use-user-media'
 import useWebrtcStreaming from '~/composables/use-webrtc-streaming';
 
 const mediaDevices = useMediaDevices()
-
+const mediaDevicesList = useMediaDevicesList()
 const userMedia = useUserMedia()
 
 const air = useAir()
 
 const webrtcStreaming = useWebrtcStreaming().get();
 
-webrtcStreaming.on(WebrtcStreamingEvents.MediaDeviceSwitch, (e) => {
-  if (!mediaDevices.value.willUseMic || air.value.ended) {
+watch(
+  () => userMedia.value.micEnabled,
+  (val) => {
+    if (val && !mediaDevices.value.micDevicesList.length) {
+      mediaDevices.value.willUseMic = false
+      setTimeout(() => {
+        userMedia.value.micEnabled = false;
+      }, 0);
+      return;
+    }
+    webrtcStreaming.toggleAudio(val)
+  },
+)
+
+webrtcStreaming.on(WebrtcStreamingEvents.MediaDeviceSelect, (e) => {
+  if (air.value.ended) {
     return
   }
   if (e.kind === "audio") {
     mediaDevices.value.micDeviceId = e.device.deviceId
   }
+})
+
+onMounted(() => {
+  mediaDevicesList.updateMicrophones().then(() => {
+    if (!mediaDevices.value.micDevicesList.length) {
+      mediaDevices.value.willUseMic = false
+      userMedia.value.micEnabled = false;
+    }
+    webrtcStreaming.toggleAudio(userMedia.value.micEnabled)
+  })
 })
 
 function onChange(id: string) {
@@ -28,28 +52,13 @@ function onChange(id: string) {
 }
 
 function onToggle() {
-  if (air.value.live) {
-    userMedia.value.micEnabled =
-      !userMedia.value.micEnabled
-  } else {
-    mediaDevices.value.willUseMic =
-      !mediaDevices.value.willUseMic
-  }
+  userMedia.value.micEnabled = !userMedia.value.micEnabled
 }
 </script>
 
 <template>
-  <device-settings
-    :checked="mediaDevices.willUseMic"
-    :device-id="
-      mediaDevices.micDeviceId
-    "
-    :devices-list="
-      mediaDevices.micDevicesList
-    "
-    :disabled="air.ended"
-    label="Microphone"
-    @change="onChange"
-    @toggle="onToggle"
-  />
+  <device-settings :checked="userMedia.micEnabled" :device-id="mediaDevices.micDeviceId"
+    :devices-list="mediaDevices.micDevicesList" :disabled="air.ended" label="Microphone" @change="onChange"
+    @toggle="onToggle">
+  </device-settings>
 </template>
