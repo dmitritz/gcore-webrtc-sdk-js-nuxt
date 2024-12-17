@@ -12,9 +12,11 @@ const props = defineProps<{
     { label: string; deviceId: string}[]
   >
   disabled?: boolean
+  id: string
   readonly?: boolean
   label: string
 }>()
+
 
 const deviceNo = computed(() => {
   return Object.fromEntries(
@@ -34,12 +36,14 @@ const deviceNo = computed(() => {
         @change="$emit('toggle', !checked)"
         :disabled="disabled || devicesList.length === 0"
         :checked="checked && devicesList.length > 0"
+        :id="`${id}-on`"
       />
       {{ label.substring(0, 1).toUpperCase() + label.substring(1) }}
     </label>
     <select
       @change="(e) => $emit('change', (e.target as HTMLSelectElement).value)"
       :disabled="disabled || !checked || readonly || devicesList.length === 0"
+      :id="`${id}-select`"
     >
       <option v-if="!devicesList.length" disabled selected>No {{ label }}</option>
       <option

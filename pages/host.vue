@@ -7,6 +7,7 @@ import {
   WhipClientEvents
 } from '@gcorevideo/rtckit';
 import type { MediaDeviceSwitchInfo, MediaDeviceSwitchOffInfo } from '@gcorevideo/rtckit';
+
 import { getIngesterErrorReasonExplanation } from '~/utils/errors';
 
 const DEVICE_SWITCH_NOTIFICATION_TIMEOUT = 5000
@@ -200,7 +201,7 @@ function restart() {
   <div>
     <nuxt-layout>
       <template #header>
-        Cool, you're hosting
+        You're hosting
       </template>
       <div class="flex gap-4 flex-col md:flex-row md:basis-full justify-center">
         <div class="block my-2">
@@ -209,18 +210,18 @@ function restart() {
             <camera-preview v-if="
               mediaDevices.willUseCamera
             " :live="air.live" :ended="air.ended">
-              <a @click.prevent="restart" href="#" v-if="air.ended">reload</a>
+              <a @click.prevent="restart" href="#" v-if="air.ended" id="reload">reload</a>
             </camera-preview>
             <mic-control />
           </div>
           <div class="block my-2 flex gap-2 items-center">
-            <button @click="start" v-if="canStart" class="px-4 py-1 btn">
+            <button @click="start" v-if="canStart" class="px-4 py-1 btn" id="start">
               Start
             </button>
-            <button @click="leave" v-if="air.live" class="px-4 py-1 btn">
+            <button @click="leave" v-if="air.live" class="px-4 py-1 btn" id="leave">
               Leave
             </button>
-            <a v-if="air.live && stream.playerUrl" :href="stream.playerUrl" target="_blank">watch</a>
+            <a v-if="air.live && stream.playerUrl" :href="stream.playerUrl" target="_blank" id="player_url">watch</a>
           </div>
         </div>
         <div class="block my-2 justify-center flex flex-col gap-2 text-center md:basis-1/2 lg:basis-1/3">
@@ -229,8 +230,8 @@ function restart() {
           </div>
           <div class="text-slate-900">
             Quality:
-            <span id="video_quality" :class="{
-              'video-quality': true,
+            <span id="stream_quality" :class="{
+              'stream-quality': true,
               'degraded': qualityStatus === QualityStatus.Degraded,
               'improved': qualityStatus === QualityStatus.Improved,
             }">
@@ -240,26 +241,26 @@ function restart() {
             </span>
           </div>
           <div v-if="micSwitched">
-            <div class="text-slate-900">Microphone input has been changed from <b>{{ micSwitched.prev.label }}</b> to
+            <div class="text-slate-900" id="mic_changed">Microphone input has been changed from <b>{{ micSwitched.prev.label }}</b> to
               <b>{{ micSwitched.device.label }}</b>
             </div>
           </div>
           <div v-if="micSwitchedOff">
-            <div class="text-red-900">Microphone <b>{{ micSwitchedOff.device.label }}</b> has been disconnected</div>
+            <div class="text-red-900" id="mic_disconnected">Microphone <b>{{ micSwitchedOff.device.label }}</b> has been disconnected</div>
           </div>
           <div v-if="status === Status.Ready && !mediaDevices.micDevicesList.length">
-            <div class="text-red-900">No microphones are available</div>
+            <div class="text-red-900" id="mic_unavailable">No microphones are available</div>
           </div>
           <div v-if="cameraSwitched">
-            <div class="text-slate-900">Camera input has been changed from <b>{{ cameraSwitched.prev.label }}</b> to
+            <div class="text-slate-900" id="camera_changed">Camera input has been changed from <b>{{ cameraSwitched.prev.label }}</b> to
               <b>{{ cameraSwitched.device.label }}</b>
             </div>
           </div>
           <div v-if="cameraSwitchedOff">
-            <div class="text-red-900">Camera <b>{{ cameraSwitchedOff.device.label }}</b> has been disconnected</div>
+            <div class="text-red-900" id="camera_disconnected">Camera <b>{{ cameraSwitchedOff.device.label }}</b> has been disconnected</div>
           </div>
           <div v-if="ingesterError">
-            <div class="text-red-900">{{ ingesterError }}</div>
+            <div class="text-red-900" id="ingester_error">{{ ingesterError }}</div>
           </div>
         </div>
       </div>
@@ -288,19 +289,19 @@ function restart() {
   font-weight: bold;
 }
 
-.video-quality.degraded {
+.stream-quality.degraded {
   @apply text-red-600;
 }
 
-.video-quality.degraded::before {
+.stream-quality.degraded::before {
   content: "↓";
 }
 
-.video-quality.improved {
+.stream-quality.improved {
   @apply text-green-600;
 }
 
-.video-quality.improved::before {
+.stream-quality.improved::before {
   content: "↑";
 }
 </style>

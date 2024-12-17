@@ -42,7 +42,7 @@ watch(
 <template>
   <div class="camera-preview max-w-2xl mb-4 flex flex-col justify-items-center justify-center items-center"
     v-if="mediaDevices.willUseCamera">
-    <video class="aspect-video w-full" ref="video" autoplay playsinline muted>
+    <video class="aspect-video w-full" ref="video" autoplay playsinline muted id="camera_preview">
       Self preview
     </video>
     <div class="preview-label px-2 py-1 flex gap-1 items-center" :class="{ live }">
@@ -51,9 +51,9 @@ watch(
       <span v-if="
         frameSize.width &&
         frameSize.height
-      ">({{
+      " id="preview_videores">({{
         frameSize.width
-        }}&times;{{
+      }}&times;{{
           frameSize.height
         }})</span>
       <slot>

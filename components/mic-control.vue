@@ -58,7 +58,7 @@ function onToggle() {
 
 <template>
   <device-settings :checked="userMedia.micEnabled" :device-id="mediaDevices.micDeviceId"
-    :devices-list="mediaDevices.micDevicesList" :disabled="air.ended" label="Microphone" @change="onChange"
+    :devices-list="mediaDevices.micDevicesList" :disabled="air.ended" label="Microphone" @change="onChange" id="mic"
     @toggle="onToggle">
   </device-settings>
 </template>

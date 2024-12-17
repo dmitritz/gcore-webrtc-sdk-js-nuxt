@@ -74,12 +74,12 @@ function onToggle() {
 
 <template>
   <device-settings :checked="userMedia.cameraEnabled" :device-id="mediaDevices.cameraDeviceId"
-    :devices-list="mediaDevices.cameraDevicesList" :disabled="air.ended" label="Camera"
+    :devices-list="mediaDevices.cameraDevicesList" :disabled="air.ended" label="Camera" id="camera"
     @change="v => mediaDevices.cameraDeviceId = v" @toggle="onToggle">
     <span>
-      <label for="videores">quality</label>
+      <label for="camera_videores">quality</label>
       <select v-model="mediaDevices.resolution" :disabled="air.ended || !mediaDevices.willUseCamera || air.live"
-        id="videores">
+        id="camera_videores">
         <option value key="0" disabled>Default</option>
         <option v-for="vres of mediaDevices.resolutions" :key="vres.height" :value="vres.height">
           {{ vres.width }}×{{ vres.height }}

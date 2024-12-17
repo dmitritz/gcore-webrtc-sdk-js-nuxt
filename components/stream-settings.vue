@@ -8,7 +8,7 @@
       WHIP endpoint
     </div>
     <div class="col-span-3">
-      <input type="text" v-model="stream.whipEndpoint" class="border border-current px-1 py-0.5 w-full" />
+      <input type="text" v-model="stream.whipEndpoint" class="border border-current px-1 py-0.5 w-full" id="whip_endpoint"/>
     </div>
     <div class="col-span-1">
       WHEP endpoint
