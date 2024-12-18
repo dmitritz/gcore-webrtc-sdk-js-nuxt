@@ -87,14 +87,7 @@ export default function useMediaDevicesReconfigure() {
   )
 
   function closeTracks() {
-    const s = state.value.stream
-    if (s) {
-      s.getTracks().forEach((t) => {
-        s.removeTrack(t)
-        t.stop()
-      })
-      state.value.stream = null
-    }
+    state.value.stream = null
     state.value.audioTrack = null
     state.value.videoTrack = null
   }

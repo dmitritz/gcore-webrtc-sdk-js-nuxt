@@ -116,7 +116,7 @@ function start() {
           ingesterError.value = getIngesterErrorReasonExplanation(reason)
         }),
         new StreamMeta(),
-        new VideoResolutionChangeDetector(({ degraded, height, srcHeight }) => {
+        new VideoResolutionChangeDetector(({ degraded, height }) => {
           videoQuality.value = height
           if (degraded) {
             qualityStatus.value = QualityStatus.Degraded;
