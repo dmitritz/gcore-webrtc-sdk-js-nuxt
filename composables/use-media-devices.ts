@@ -43,8 +43,6 @@ export const VIDEORES: Record<
 
 export const VIDEORES_DEFAULT = 1080
 
-const webrtcStreaming = useWebrtcStreaming()
-
 export default () => {
   const state = useState<{
     cameraDevicesList: DeviceInfo[]
@@ -54,7 +52,6 @@ export default () => {
     micDeviceId: string
     willUseCamera: boolean
     willUseMic: boolean
-    pending: boolean
     resolutions: VideoResoultion[]
     resolution: number
   }>("mediaDevices", () => ({
@@ -65,7 +62,6 @@ export default () => {
     micDeviceId: '',
     willUseCamera: true,
     willUseMic: true,
-    pending: false,
     resolutions: [],
     resolution: VIDEORES_DEFAULT,
   }))

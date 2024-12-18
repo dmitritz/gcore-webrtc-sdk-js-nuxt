@@ -14,11 +14,11 @@ const air = useAir()
 const webrtcStreaming = useWebrtcStreaming().get();
 
 watch(
-  () => userMedia.value.micEnabled,
+  () => mediaDevices.value.willUseMic,
   (val) => {
     if (val && !mediaDevices.value.micDevicesList.length) {
-      mediaDevices.value.willUseMic = false
       setTimeout(() => {
+        mediaDevices.value.willUseMic = false
         userMedia.value.micEnabled = false;
       }, 0);
       return;
@@ -52,12 +52,15 @@ function onChange(id: string) {
 }
 
 function onToggle() {
-  userMedia.value.micEnabled = !userMedia.value.micEnabled
+  // disabled audio tracks doesn't play well with the ingester across all browsers (notably Safari)
+  // userMedia.value.micEnabled = !userMedia.value.micEnabled
+  mediaDevices.value.willUseMic = !mediaDevices.value.willUseMic
+
 }
 </script>
 
 <template>
-  <device-settings :checked="userMedia.micEnabled" :device-id="mediaDevices.micDeviceId"
+  <device-settings :checked="mediaDevices.willUseMic" :device-id="mediaDevices.micDeviceId"
     :devices-list="mediaDevices.micDevicesList" :disabled="air.ended" label="Microphone" @change="onChange" id="mic"
     @toggle="onToggle">
   </device-settings>

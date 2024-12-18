@@ -7,9 +7,18 @@ export default function useMediaDevicesList() {
     updateMicrophones
   }
 
+  async function updateDevicesList(cb: () => Promise<void>) {
+    try {
+      await cb()
+    } catch (e) {
+      mediaDevices.value.error = String(e);
+    }
+  }
+
   async function updateCameras() {
-    mediaDevices.value.cameraDevicesList =
-      await webrtcStreaming.get().mediaDevices.getCameras()
+    await updateDevicesList(async () => {
+      mediaDevices.value.cameraDevicesList = await webrtcStreaming.get()
+        .mediaDevices.getCameras()
         .then(items => items.map((d, i) => ({
           deviceId: d.deviceId,
           label:
@@ -17,17 +26,20 @@ export default function useMediaDevicesList() {
             `Camera ${i + 1}`,
           groupId: d.groupId,
         })))
+    });
   }
 
   async function updateMicrophones() {
-    mediaDevices.value.micDevicesList =
-      await webrtcStreaming.get().mediaDevices.getMicrophones()
-        .then(items => items.map((d, i) => ({
-          deviceId: d.deviceId,
-          label:
-            d.label ||
-            `Microphone ${i + 1}`,
-          groupId: d.groupId,
-        })))
+    await updateDevicesList(async () => {
+      mediaDevices.value.micDevicesList =
+        await webrtcStreaming.get().mediaDevices.getMicrophones()
+          .then(items => items.map((d, i) => ({
+            deviceId: d.deviceId,
+            label:
+              d.label ||
+              `Microphone ${i + 1}`,
+            groupId: d.groupId,
+          })))
+    });
   }
 }

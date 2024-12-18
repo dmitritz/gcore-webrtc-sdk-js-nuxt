@@ -61,6 +61,11 @@ const status = ref<Status>(Status.Initial)
 const statusName = computed(() => STATUS_NAMES[status.value]);
 const videoQuality = ref(0)
 const qualityStatus = ref<QualityStatus>(QualityStatus.None)
+const silentAudio = computed(() => !mediaDevices.value.willUseMic)
+const selectedMic = computed(
+  () => mediaDevices.value.micDeviceId
+    && mediaDevices.value.micDevicesList.find(d => d.deviceId === mediaDevices.value.micDeviceId)?.label
+)
 
 const air = useAir()
 const started = computed(() => air.value.live || air.value.ended)
@@ -106,8 +111,6 @@ function start() {
       icePreferTcp: true,
       iceTransportPolicy: 'relay',
       mediaDevicesAutoSwitch: true,
-      mediaDevicesAutoSwitchRefresh: true,
-      mediaDevicesMultiOpen: false,
       plugins: [
         new IngesterErrorHandler((reason) => {
           ingesterError.value = getIngesterErrorReasonExplanation(reason)
@@ -240,24 +243,37 @@ function restart() {
               <template v-else>{{ videoQuality }}p</template>
             </span>
           </div>
+          <div class="text-slate-900" id="audio_status">Audio:
+            <span v-if="silentAudio" id="using_silent_audio">silent</span>
+            <span v-else-if="selectedMic" id="using_microphone">{{ selectedMic }}</span>
+            <span v-else-if="!userMedia.stream" id="pending_microphone">...</span>
+            <b v-else>(!)</b>
+          </div>
           <div v-if="micSwitched">
-            <div class="text-slate-900" id="mic_changed">Microphone input has been changed from <b>{{ micSwitched.prev.label }}</b> to
+            <div class="text-slate-900" id="mic_changed">Microphone input has been changed
+              from <b>{{ micSwitched.prev.label }}</b> to
               <b>{{ micSwitched.device.label }}</b>
             </div>
           </div>
           <div v-if="micSwitchedOff">
-            <div class="text-red-900" id="mic_disconnected">Microphone <b>{{ micSwitchedOff.device.label }}</b> has been disconnected</div>
+            <div class="text-red-900" id="mic_disconnected">Microphone <b>{{ micSwitchedOff.device.label }}</b>
+              has been disconnected
+            </div>
           </div>
           <div v-if="status === Status.Ready && !mediaDevices.micDevicesList.length">
             <div class="text-red-900" id="mic_unavailable">No microphones are available</div>
           </div>
           <div v-if="cameraSwitched">
-            <div class="text-slate-900" id="camera_changed">Camera input has been changed from <b>{{ cameraSwitched.prev.label }}</b> to
+            <div class="text-slate-900" id="camera_changed">Camera input has been changed from <b>{{
+              cameraSwitched.prev.label
+                }}</b> to
               <b>{{ cameraSwitched.device.label }}</b>
             </div>
           </div>
           <div v-if="cameraSwitchedOff">
-            <div class="text-red-900" id="camera_disconnected">Camera <b>{{ cameraSwitchedOff.device.label }}</b> has been disconnected</div>
+            <div class="text-red-900" id="camera_disconnected">Camera <b>{{ cameraSwitchedOff.device.label }}</b>
+              has been disconnected
+            </div>
           </div>
           <div v-if="ingesterError">
             <div class="text-red-900" id="ingester_error">{{ ingesterError }}</div>
