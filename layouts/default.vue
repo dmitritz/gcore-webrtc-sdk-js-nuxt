@@ -82,7 +82,7 @@ const locked = computed(
         />
       </div>
       <div class="text-end text-slate-700 text-sm">
-        <p><code>{{ buildId }}</code>/rtckit <b><{{ rtckitver }}</b></p>
+        <p><code>{{ buildId }}</code>/rtckit <b>{{ rtckitver }}</b></p>
       </div>
     </footer>
   </div>
