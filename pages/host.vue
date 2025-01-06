@@ -56,6 +56,10 @@ const cameraSwitchedOff = ref<MediaDeviceSwitchOffInfo | null>(null)
 const mediaDevices = useMediaDevices()
 const stream = await useStream()
 const webrtcStreaming = useWebrtcStreaming()
+const mediaDevicesList = useMediaDevicesList()
+const air = useAir()
+const userMedia = useUserMedia()
+
 const ingesterError = ref("")
 const status = ref<Status>(Status.Initial)
 const statusName = computed(() => STATUS_NAMES[status.value]);
@@ -67,14 +71,8 @@ const selectedMic = computed(
     && mediaDevices.value.micDevicesList.find(d => d.deviceId === mediaDevices.value.micDeviceId)?.label
 )
 
-const air = useAir()
 const started = computed(() => air.value.live || air.value.ended)
 
-let startUserMedia: () => void
-
-const userMedia = useUserMedia((cb: () => void) => {
-  startUserMedia = cb
-})
 const canStart = computed(
   () =>
     !!userMedia.value.videoTrack &&
@@ -197,6 +195,24 @@ function leave() {
 
 function restart() {
   window.location.reload()
+}
+
+function startUserMedia() {
+  updateDevicesList()
+
+  const w = webrtcStreaming.get()
+  w.on(WebrtcStreamingEvents.MediaDeviceSwitch, () => setTimeout(refreshDevicesList, 0));
+  w.on(WebrtcStreamingEvents.MediaDeviceSwitchOff, () => setTimeout(refreshDevicesList, 0));
+
+  function refreshDevicesList() {
+    w.mediaDevices.reset();
+    updateDevicesList();
+  }
+}
+
+async function updateDevicesList() {
+  await mediaDevicesList.updateCameras();
+  await mediaDevicesList.updateMicrophones();
 }
 </script>
 

@@ -14,7 +14,7 @@ export default function useMediaDevicesReconfigure() {
       params.audio = mediaDevices.value.micDeviceId || true;
     }
     if (mediaDevices.value.willUseCamera) {
-      params.video = mediaDevices.value.cameraDeviceId || mediaDevices.value.cameraDevicesList[0]?.deviceId || false
+      params.video = mediaDevices.value.cameraDeviceId || mediaDevices.value.cameraDevicesList[0]?.deviceId || true
       if (mediaDevices.value.resolution) {
         params.resolution = mediaDevices.value.resolution
       }
@@ -24,7 +24,8 @@ export default function useMediaDevicesReconfigure() {
 
   watch(
     () => foldConstraints(constraints.value),
-    async (_: string) => {
+    async (value: string) => {
+      console.log('useMediaDevicesReconfigure watch constraints %s', value)
       closeTracks()
       if (
         constraints.value.audio ===
