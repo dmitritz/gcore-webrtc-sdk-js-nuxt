@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { version as rtckitver } from "@gcorevideo/rtckit";
 
+const buildId = import.meta.env.VITE_SENTRY_BUILD_ID;
+
 const air = useAir()
 const auth = useAuth()
 const route = useRoute()
@@ -80,7 +82,7 @@ const locked = computed(
         />
       </div>
       <div class="text-end text-slate-700 text-sm">
-        <p>rtckit <b>{{ rtckitver }}</b></p>
+        <p><code>{{ buildId }}</code>/rtckit <b><{{ rtckitver }}</b></p>
       </div>
     </footer>
   </div>
