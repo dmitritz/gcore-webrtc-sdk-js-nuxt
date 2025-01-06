@@ -37,6 +37,7 @@ const locked = computed(
       <nav class="my-2 flex gap-2 mb-4">
         <router-link
           :to="{ path: '/', query }"
+          id="nav_home"
           class="r"
           :class="{ disabled: locked }"
           >Home</router-link
@@ -46,12 +47,14 @@ const locked = computed(
             path: '/settings',
             query,
           }"
+          id="nav_settings"
           :class="{ disabled: locked }"
           >Settings</router-link
         >
         <router-link
           :to="{ path: '/host', query }"
           v-if="!!auth"
+          id="nav_host"
           >Host</router-link
         >
       </nav>
