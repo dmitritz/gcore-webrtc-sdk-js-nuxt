@@ -21,22 +21,22 @@ watch(() => mediaDevices.value.cameraDeviceId, (val) => {
   }
 })
 
-watch(() => mediaDevices.value.resolutions, (val) => {
-  if (!val.length) {
+watch(() => mediaDevices.value.resolutions.map(({ height }) => String(height)).join(), () => {
+  if (!mediaDevices.value.resolutions.length) {
     return
   }
   if (!mediaDevices.value.resolution) {
-    mediaDevices.value.resolution = val[0].height
+    mediaDevices.value.resolution = mediaDevices.value.resolutions[0].height
     return
   }
-  if (!val.find((v) => v.height === mediaDevices.value.resolution)) {
-    mediaDevices.value.resolution = val[0].height
+  if (!mediaDevices.value.resolutions.some((v) => v.height === mediaDevices.value.resolution)) {
+    mediaDevices.value.resolution = mediaDevices.value.resolutions[0].height
   }
 })
 
-watch(() => mediaDevices.value.cameraDevicesList, (val) => {
-  if (val.length && !mediaDevices.value.cameraDeviceId) {
-    mediaDevices.value.cameraDeviceId = val[0].deviceId
+watch(() => mediaDevices.value.cameraDevicesList.map((deviceId) => deviceId).join(), () => {
+  if (mediaDevices.value.cameraDevicesList.length && !mediaDevices.value.cameraDeviceId) {
+    mediaDevices.value.cameraDeviceId = mediaDevices.value.cameraDevicesList[0].deviceId
   }
 })
 

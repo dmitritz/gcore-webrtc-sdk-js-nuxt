@@ -24,8 +24,7 @@ export default function useMediaDevicesReconfigure() {
 
   watch(
     () => foldConstraints(constraints.value),
-    async (value: string) => {
-      console.log('useMediaDevicesReconfigure watch constraints %s', value)
+    async () => {
       closeTracks()
       if (
         constraints.value.audio ===

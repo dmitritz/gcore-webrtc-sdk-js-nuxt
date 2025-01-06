@@ -86,9 +86,9 @@ onMounted(() => {
 })
 
 watch(
-  () => mediaDevices.value.cameraDevicesList,
-  (val) => {
-    if (val.length && status.value === Status.ConnectingDevices) {
+  () => mediaDevices.value.cameraDevicesList.map(({ deviceId }) => deviceId).join(),
+  () => {
+    if (mediaDevices.value.cameraDevicesList.length && status.value === Status.ConnectingDevices) {
       status.value = Status.Ready;
     }
   }
