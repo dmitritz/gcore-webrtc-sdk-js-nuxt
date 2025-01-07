@@ -22,75 +22,71 @@ export default function useMediaDevicesReconfigure() {
     return params
   })
 
-  watch(
-    () => foldConstraints(constraints.value),
-    async () => {
-      closeTracks()
-      if (
-        constraints.value.audio ===
-        false &&
-        constraints.value.video ===
-        false
-      ) {
-        return
-      }
-      try {
-        const s =
-          await webrtcStreaming.get().openSourceStream(constraints.value)
-        state.value.stream = s
-        s.getTracks().forEach(
-          (track: MediaStreamTrack) => {
-            if (
-              track.kind === 'audio'
-            ) {
-              state.value.audioTrack =
-                track
-              track.addEventListener(
-                'ended',
-                () => {
-                  if (
-                    state.value
-                      .audioTrack ===
-                    track
-                  ) {
-                    state.value.audioTrack =
-                      null
-                  }
-                },
-              )
-            } else {
-              state.value.videoTrack =
-                track
-              track.addEventListener(
-                'ended',
-                () => {
-                  if (
-                    state.value
-                      .videoTrack ===
-                    track
-                  ) {
-                    state.value.videoTrack =
-                      null
-                  }
-                },
-              )
-            }
-          },
-        )
-      } catch (e) {
-        state.value.error = String(e)
-      }
-    },
-    {
-      immediate: true,
-    }
-  )
-
   function closeTracks() {
     state.value.stream = null
     state.value.audioTrack = null
     state.value.videoTrack = null
   }
+
+  async function openSourceStream() {
+    closeTracks()
+    if (
+      constraints.value.audio ===
+      false &&
+      constraints.value.video ===
+      false
+    ) {
+      return
+    }
+    try {
+      const s =
+        await webrtcStreaming.get().openSourceStream(constraints.value)
+      state.value.stream = s
+      s.getTracks().forEach(
+        (track: MediaStreamTrack) => {
+          if (
+            track.kind === 'audio'
+          ) {
+            state.value.audioTrack =
+              track
+            track.addEventListener(
+              'ended',
+              () => {
+                if (
+                  state.value
+                    .audioTrack ===
+                  track
+                ) {
+                  state.value.audioTrack =
+                    null
+                }
+              },
+            )
+          } else {
+            state.value.videoTrack =
+              track
+            track.addEventListener(
+              'ended',
+              () => {
+                if (
+                  state.value
+                    .videoTrack ===
+                  track
+                ) {
+                  state.value.videoTrack =
+                    null
+                }
+              },
+            )
+          }
+        },
+      )
+    } catch (e) {
+      state.value.error = String(e)
+    }
+  }
+
+  return openSourceStream
 }
 
 function foldConstraints(c: WebrtcStreamParams) {

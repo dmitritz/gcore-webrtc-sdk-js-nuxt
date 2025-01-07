@@ -1,10 +1,3 @@
-import {
-  watch,
-} from 'vue'
-
-import useWebrtcStreaming from './use-webrtc-streaming.js'
-import { WebrtcStreamingEvents } from '@gcorevideo/rtckit'
-
 export type DeviceInfo = {
   label: string
   deviceId: string

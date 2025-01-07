@@ -198,8 +198,6 @@ function restart() {
 }
 
 function startUserMedia() {
-  updateDevicesList()
-
   const w = webrtcStreaming.get()
   w.on(WebrtcStreamingEvents.MediaDeviceSwitch, () => setTimeout(refreshDevicesList, 0));
   w.on(WebrtcStreamingEvents.MediaDeviceSwitchOff, () => setTimeout(refreshDevicesList, 0));

@@ -6,7 +6,6 @@ import {
 
 const mediaDevices = useMediaDevices()
 const userMedia = useUserMedia()
-useMediaDevicesReconfigure()
 
 defineProps<{
   ended?: boolean
@@ -53,7 +52,7 @@ watch(
         frameSize.height
       " id="preview_videores">({{
         frameSize.width
-      }}&times;{{
+        }}&times;{{
           frameSize.height
         }})</span>
       <slot>

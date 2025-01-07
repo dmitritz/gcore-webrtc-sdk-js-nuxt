@@ -17,29 +17,42 @@ export default function useMediaDevicesList() {
 
   async function updateCameras() {
     await updateDevicesList(async () => {
-      mediaDevices.value.cameraDevicesList = await webrtcStreaming.get()
+      const newCameras = await webrtcStreaming.get()
         .mediaDevices.getCameras()
-        .then(items => items.map((d, i) => ({
-          deviceId: d.deviceId,
-          label:
-            d.label ||
-            `Camera ${i + 1}`,
-          groupId: d.groupId,
-        })))
+      if (sameDevices(mediaDevices.value.cameraDevicesList, newCameras)) {
+        return
+      }
+      mediaDevices.value.cameraDevicesList = newCameras.map((d, i) => ({
+        deviceId: d.deviceId,
+        label:
+          d.label ||
+          `Camera ${i + 1}`,
+        groupId: d.groupId,
+      }));
     });
   }
 
   async function updateMicrophones() {
     await updateDevicesList(async () => {
-      mediaDevices.value.micDevicesList =
-        await webrtcStreaming.get().mediaDevices.getMicrophones()
-          .then(items => items.map((d, i) => ({
-            deviceId: d.deviceId,
-            label:
-              d.label ||
-              `Microphone ${i + 1}`,
-            groupId: d.groupId,
-          })))
+      const newMics = await webrtcStreaming.get().mediaDevices.getMicrophones();
+      if (sameDevices(mediaDevices.value.micDevicesList, newMics)) {
+        return
+      }
+      mediaDevices.value.micDevicesList = newMics.map((d, i) => ({
+        deviceId: d.deviceId,
+        label:
+          d.label ||
+          `Microphone ${i + 1}`,
+        groupId: d.groupId,
+      }))
     });
+  }
+
+  function sameDevices(alist: DeviceInfo[], blist: DeviceInfo[]): boolean {
+    if (alist.length !== blist.length) {
+      return false
+    }
+    // TODO check: assuming the items order is stable
+    return alist.every((a, i) => a.deviceId === blist[i].deviceId)
   }
 }

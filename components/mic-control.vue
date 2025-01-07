@@ -8,8 +8,8 @@ import useWebrtcStreaming from '~/composables/use-webrtc-streaming';
 const mediaDevices = useMediaDevices()
 const mediaDevicesList = useMediaDevicesList()
 const userMedia = useUserMedia()
-
 const air = useAir()
+const openSourceStream = useMediaDevicesReconfigure()
 
 const webrtcStreaming = useWebrtcStreaming().get();
 
@@ -41,6 +41,9 @@ onMounted(() => {
     if (!mediaDevices.value.micDevicesList.length) {
       mediaDevices.value.willUseMic = false
       userMedia.value.micEnabled = false;
+    } else if (mediaDevices.value.willUseMic) {
+      mediaDevices.value.micDeviceId = mediaDevices.value.micDevicesList[0].deviceId
+      openSourceStream();
     }
     webrtcStreaming.toggleAudio(userMedia.value.micEnabled)
   })
@@ -49,13 +52,14 @@ onMounted(() => {
 function onChange(id: string) {
   mediaDevices.value.micDeviceId = id
   mediaDevices.value.willUseMic = true
+  openSourceStream()
 }
 
 function onToggle() {
   // disabled audio tracks doesn't play well with the ingester across all browsers (notably Safari)
   // userMedia.value.micEnabled = !userMedia.value.micEnabled
   mediaDevices.value.willUseMic = !mediaDevices.value.willUseMic
-
+  openSourceStream()
 }
 </script>
 

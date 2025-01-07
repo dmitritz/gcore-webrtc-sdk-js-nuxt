@@ -1,0 +1,24 @@
+on:
+    schedule:
+        - cron: '0 0 * * *'
+jobs:
+    audit:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                sparse-checkout: |
+                  package.json
+                  package-lock.json
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '22'
+            - name: Run audit
+              run: npm audit fix
+            - name: Commit changes
+              run: |
+                # git config --global user.email "
+                git add package.json package-lock.json
+                git commit -m "fix: audit" && git push || echo "No changes to commit"
