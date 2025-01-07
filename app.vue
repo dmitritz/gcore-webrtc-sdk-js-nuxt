@@ -7,6 +7,7 @@ import * as Sentry from '@sentry/browser'
 
 if (typeof window !== 'undefined') {
   Sentry.init({
+    debug: true,
     dsn: import.meta.env.VITE_SENTRY_DSN,
     environment: import.meta.env.VITE_SENTRY_ENV,
     initialScope: (scope) => {
