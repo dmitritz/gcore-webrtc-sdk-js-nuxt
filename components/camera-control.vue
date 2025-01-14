@@ -19,6 +19,7 @@ watch(() => mediaDevices.value.cameraDeviceId, (val) => {
     if (!sameResolutions(mediaDevices.value.resolutions, r)) {
       mediaDevices.value.resolutions = r
     }
+    ensureValidResolution();
   } else {
     mediaDevices.value.resolutions = []
   }
@@ -28,13 +29,7 @@ watch(() => mediaDevices.value.resolutions.map(({ height }) => String(height)).j
   if (!mediaDevices.value.resolutions.length) {
     return
   }
-  if (!mediaDevices.value.resolution) {
-    mediaDevices.value.resolution = mediaDevices.value.resolutions[0].height
-    return
-  }
-  if (!mediaDevices.value.resolutions.some((v) => v.height === mediaDevices.value.resolution)) {
-    mediaDevices.value.resolution = mediaDevices.value.resolutions[0].height
-  }
+  ensureValidResolution();
 })
 
 watch(() => mediaDevices.value.cameraDevicesList, () => {
@@ -92,6 +87,12 @@ webrtc.on(WebrtcStreamingEvents.MediaDeviceSelect, (e) => {
     mediaDevices.value.cameraDeviceId = e.device.deviceId
   }
 })
+
+function ensureValidResolution() {
+  if (mediaDevices.value.resolution && !mediaDevices.value.resolutions.some((v) => v.height === mediaDevices.value.resolution)) {
+    mediaDevices.value.resolution = mediaDevices.value.resolutions[0].height
+  }
+}
 
 function onToggle() {
   userMedia.value.cameraEnabled =
