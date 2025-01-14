@@ -89,7 +89,7 @@ webrtc.on(WebrtcStreamingEvents.MediaDeviceSelect, (e) => {
 })
 
 function ensureValidResolution() {
-  if (mediaDevices.value.resolution && !mediaDevices.value.resolutions.some((v) => v.height === mediaDevices.value.resolution)) {
+  if (!mediaDevices.value.resolution || !mediaDevices.value.resolutions.some((v) => v.height === mediaDevices.value.resolution)) {
     mediaDevices.value.resolution = mediaDevices.value.resolutions[0].height
   }
 }

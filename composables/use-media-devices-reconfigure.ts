@@ -86,7 +86,17 @@ export default function useMediaDevicesReconfigure() {
     }
   }
 
-  return openSourceStream
+  return (function () {
+    let timerId: ReturnType<typeof setTimeout> | null = null
+    return function () {
+      if (timerId === null) {
+        timerId = setTimeout(function () {
+          timerId = null;
+          openSourceStream();
+        }, 0)
+      }
+    }
+  }())
 }
 
 function foldConstraints(c: WebrtcStreamParams) {
