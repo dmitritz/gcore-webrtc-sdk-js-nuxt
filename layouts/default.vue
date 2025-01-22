@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { version as rtckitver } from "@gcorevideo/rtckit";
+import { reportError, version as rtckitver } from "@gcorevideo/rtckit";
+import {
+  BugAntIcon,
+  CheckIcon,
+} from '@heroicons/vue/16/solid'
 import pkg from "../package.json";
 
 const air = useAir()
@@ -11,6 +15,15 @@ const locked = computed(
     route.path === '/host' &&
     air.value.live,
 )
+const reported = ref(false)
+
+function report() {
+  reported.value = true
+  reportError(new Error('User reported error'))
+  setTimeout(() => {
+    reported.value = false
+  }, 1000)
+}
 </script>
 
 <template>
@@ -33,6 +46,10 @@ const locked = computed(
           <slot name="header"
             >Here we go</slot
           >
+          <button @click="report" title="Report a bug" class="border border-red-300 inline-flex justify-self-end rounded text-sm p-1" :disabled="reported">
+            <bug-ant-icon class="w-4 h-4 text-red-500" v-if="!reported" />
+            <check-icon class="w-4 h-4 text-red-500" v-else />
+          </button>
         </div>
       </div>
       <nav class="my-2 flex gap-2 mb-4">
