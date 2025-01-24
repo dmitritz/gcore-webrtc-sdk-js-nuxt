@@ -7,6 +7,7 @@ const stream = ref<StreamInfo>({
   whipEndpoint: '',
   whepEndpoint: '',
   playerUrl: '',
+  sources: [],
 })
 
 export default async function useStream(): Promise<Ref<StreamInfo>> {
@@ -14,11 +15,13 @@ export default async function useStream(): Promise<Ref<StreamInfo>> {
   const streamId = url.searchParams.get('stream_id');
   const token = url.searchParams.get('stream_token');
   const server = url.searchParams.get('server');
+  const sources = url.searchParams.get('sources')?.split(',') ?? [];
   if (streamId && token) {
     stream.value.id = parseInt(streamId, 10)
     stream.value.whipEndpoint = buildWhipEndpoint(streamId, token, server || '')
     stream.value.whepEndpoint = ''
     stream.value.playerUrl = ''
+    stream.value.sources = sources
   } else {
     const cookie =
       useCookie<StreamInfo>('stream')
@@ -31,6 +34,9 @@ export default async function useStream(): Promise<Ref<StreamInfo>> {
       throw new Error(
         'Failed to create stream',
       )
+    }
+    if (sources.length || !Array.isArray(cookie.value.sources)) {
+      cookie.value.sources = sources
     }
     stream.value = cookie.value
   }

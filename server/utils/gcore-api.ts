@@ -28,5 +28,10 @@ export function webrtcStreamCreatedResponse(stream: WebrtcStream) {
     playerUrl: stream.playerUrl,
     whepEndpoint: stream.whepEndpoint,
     whipEndpoint: stream.whipEndpoint,
+    sources: [
+      stream.dashUrl,
+      stream.hlsCmafUrl,
+      stream.hlsMpegtsUrl,
+    ].filter((s: string | null) => s !== null),
   }
 }

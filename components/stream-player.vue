@@ -2,6 +2,7 @@
 import useStream from "~/composables/use-stream";
 
 const stream = await useStream();
+// TODO use new player
 </script>
 
 <template>

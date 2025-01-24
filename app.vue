@@ -2,7 +2,8 @@
 import pkg from './package.json' with { type: 'json' }
 import rtckit from '@gcorevideo/rtckit/package.json' with { type: 'json' }
 import rtckitNode from '@gcorevideo/rtckit-node/package.json' with { type: 'json' }
-import {RemoteTracer, SentryTracer, setTracer } from "@gcorevideo/rtckit";
+import { setTracer } from "@gcorevideo/rtckit";
+import { RemoteTracer, SentryTracer } from "@gcorevideo/utils";
 import * as Sentry from '@sentry/browser'
 import Fingerprint from '@fingerprintjs/fingerprintjs'
 

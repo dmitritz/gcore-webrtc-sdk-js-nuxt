@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { reportError, version as rtckitver } from "@gcorevideo/rtckit";
+import { version as rtckitver } from "@gcorevideo/rtckit";
+import { reportError } from "@gcorevideo/utils";
 import {
   BugAntIcon,
   CheckIcon,
