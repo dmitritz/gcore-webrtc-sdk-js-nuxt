@@ -8,5 +8,7 @@ export function getIngesterErrorReasonExplanation(code: IngesterErrorReason): st
       return 'Stream token is invalid'
     case IngesterErrorReason.DuplicateStream:
       return 'Someone else is already streaming'
+    case IngesterErrorReason.StreamDeactivated:
+      return 'Stream is deactivated'
   }
 }
