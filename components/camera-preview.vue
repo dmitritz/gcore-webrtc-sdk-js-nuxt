@@ -7,6 +7,8 @@ import {
 const mediaDevices = useMediaDevices()
 const userMedia = useUserMedia()
 
+const showPreviewLabel = false;
+
 defineProps<{
   ended?: boolean
   live?: boolean
@@ -44,7 +46,7 @@ watch(
     <video class="aspect-video w-full" ref="video" autoplay playsinline muted id="camera_preview">
       Self preview
     </video>
-    <div class="preview-label px-2 py-1 flex gap-1 items-center" :class="{ live }">
+    <div class="preview-label px-2 py-1 flex gap-1 items-center" :class="{ live }" v-if="showPreviewLabel">
       <signal-icon v-if="live" stroke="white" size="16" class="size-5 animate-pulse" />
       <signal-slash-icon stroke="white" size="16" class="size-5" v-else />
       <span v-if="

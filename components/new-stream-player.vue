@@ -38,7 +38,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="w-full max-w-screen-md aspect-video relative bg-black" ref="container">
+  <div class="w-full max-w-screen-md aspect-video relative bg-black" ref="container" id="player-container">
     <tv-icon class="absolute bottom-2 left-2 w-4 h-4 z-10 stroke-white"/>
     <signal-slash-icon class="absolute bottom-2 left-8 w-4 h-4 z-10 stroke-white animate-pulse" v-if="!playing" />
     <signal-icon class="absolute bottom-2 left-8 w-4 h-4 z-10 stroke-white" v-else />
