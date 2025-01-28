@@ -19,11 +19,6 @@ function setSources(value: string) {
         id="whip_endpoint"
       />
     </div>
-    <div class="col-span-1">WHEP endpoint</div>
-    <div class="col-span-3">
-      <code class="text-sm bg-slate-100">{{ stream.whepEndpoint }}</code>
-    </div>
-    <!-- TODO drop -->
     <div class="col-span-1"><label for="player_url">Player URL</label></div>
     <div class="col-span-3 text-sm">
       <input

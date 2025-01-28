@@ -53,6 +53,8 @@ if (import.meta.client) {
     console.error('Sentry client is not initialized')
   }
 }
+
+useStreamSetup()
 </script>
 
 <template>

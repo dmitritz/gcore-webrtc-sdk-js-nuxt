@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { TvIcon, SignalIcon, SignalSlashIcon } from '@heroicons/vue/24/outline';
 import { Player, PlayerEvent } from '@gcorevideo/player'
+import { TvIcon, SignalIcon, SignalSlashIcon } from '@heroicons/vue/24/outline';
 import useStream from "~/composables/use-stream";
 
 const container = ref<HTMLDivElement>()
@@ -30,7 +30,7 @@ onMounted(async () => {
       playing.value = true
     })
     setTimeout(() => {
-      player.init(container.value!)
+      player.attachTo(container.value!)
       playing.value = true
     }, 0)
   }, 3000)
