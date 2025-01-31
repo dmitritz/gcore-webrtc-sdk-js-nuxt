@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
-  css: ['~/assets/css/main.css'],
+  css: ['~/assets/css/main.css', '@gcorevideo/player-plugins/dist/index.css'],
   devtools: { enabled: true },
   postcss: {
     plugins: {
