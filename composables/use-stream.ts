@@ -9,10 +9,5 @@ const stream = ref<StreamInfo>({
 });
 
 export default function useStream(): Ref<StreamInfo> {
-  console.log(
-    "useStream whip:%s sources:%s",
-    stream.value.whipEndpoint,
-    stream.value.sources.map((s) => s.substring(0, 20))
-  );
   return stream;
 }

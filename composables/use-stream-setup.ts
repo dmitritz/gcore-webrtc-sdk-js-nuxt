@@ -1,5 +1,6 @@
 import type { StreamInfo } from "~/types/stream"
 import useStream from "./use-stream"
+import usePersistence from "./use-persistence";
 
 const STREAM_NAME = 'My damn awesome WebRTC stream'
 
@@ -17,24 +18,22 @@ export default async function useStreamSetup(): Promise<Ref<StreamInfo>> {
     stream.value.playerUrl = ''
     stream.value.sources = sources
   } else {
-    const cookie =
-      useCookie<StreamInfo>('stream')
-    const { data } = await fetchStream(cookie.value);
+    const persisted = usePersistence()
+    const { data } = await fetchStream(persisted.value);
     if (data.value) {
       // @ts-ignore
-      cookie.value = data.value
+      persisted.value = data.value
     }
-    if (!cookie.value) {
+    if (!persisted.value) {
       throw new Error(
         'Failed to create stream',
       )
     }
-    if (sources.length || !Array.isArray(cookie.value.sources)) {
-      cookie.value.sources = sources
+    if (sources.length || !Array.isArray(persisted.value.sources)) {
+      persisted.value.sources = sources
     }
-    stream.value = cookie.value
+    stream.value = persisted.value
   }
-  console.log('useStreamSetup whip:%s sources:%s', stream.value.whipEndpoint, stream.value.sources.map(s => s.substring(0, 20)))
   return stream;
 }
 
