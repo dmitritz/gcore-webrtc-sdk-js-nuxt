@@ -2,12 +2,12 @@ import {
   defineEventHandler,
   setResponseStatus,
 } from 'h3'
+import { GcoreApiError } from '@gcorevideo/rtckit-node'
 
 import gcore, {
   createWebrtcStream,
   webrtcStreamCreatedResponse,
 } from '../utils/gcore-api'
-import { GcoreApiError } from '@gcorevideo/rtckit-node'
 
 export default defineEventHandler(
   async (event) => {

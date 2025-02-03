@@ -4,50 +4,45 @@ import { reportError } from "@gcorevideo/utils";
 import {
   BugAntIcon,
   CheckIcon,
-} from '@heroicons/vue/16/solid'
+  ExclamationTriangleIcon,
+} from "@heroicons/vue/16/solid";
 import pkg from "../package.json";
 
-const air = useAir()
-const auth = useAuth()
-const route = useRoute()
-const query = route.query
-const locked = computed(
-  () =>
-    route.path === '/host' &&
-    air.value.live,
-)
-const reported = ref(false)
-
+const air = useAir();
+const auth = useAuth();
+const route = useRoute();
+const query = route.query;
+const locked = computed(() => route.path === "/host" && air.value.live);
+const reported = ref(false);
+const { whipEndpointNotPersistent, sourcesNotPersistent } =
+  useSettingsWarning();
 function report() {
-  reported.value = true
-  reportError(new Error('User reported error'))
+  reported.value = true;
+  reportError(new Error("User reported error"));
   setTimeout(() => {
-    reported.value = false
-  }, 1000)
+    reported.value = false;
+  }, 1000);
 }
 </script>
 
 <template>
-  <div
-    class="container mx-auto h-screen flex flex-col"
-  >
+  <div class="container mx-auto h-screen flex flex-col">
     <NuxtRouteAnnouncer />
     <header class="w-full my-8 px-2">
-      <div
-        class="flex basis-auto items-center flex-wrap gap-4 mb-4"
-      >
+      <div class="flex basis-auto items-center flex-wrap gap-4 mb-4">
         <img
           src="~/assets/img/gcore_black_001.svg"
           alt="Gcore logo"
           class="basis-1/3 w-1/3 max-w-48"
         />
-        <div
-          class="flex-auto text-slate-700 text-2xl"
-        >
-          <slot name="header"
-            >Here we go</slot
+        <div class="flex-auto text-slate-700 text-2xl">
+          <slot name="header">Here we go</slot>
+          <button
+            @click="report"
+            title="Report a bug"
+            class="border border-red-300 inline-flex justify-self-end rounded text-sm p-1"
+            :disabled="reported"
           >
-          <button @click="report" title="Report a bug" class="border border-red-300 inline-flex justify-self-end rounded text-sm p-1" :disabled="reported">
             <bug-ant-icon class="w-4 h-4 text-red-500" v-if="!reported" />
             <check-icon class="w-4 h-4 text-red-500" v-else />
           </button>
@@ -68,12 +63,13 @@ function report() {
           }"
           id="nav_settings"
           :class="{ disabled: locked }"
-          >Settings</router-link
-        >
-        <router-link
-          :to="{ path: '/host', query }"
-          v-if="!!auth"
-          id="nav_host"
+          >Settings
+          <exclamation-triangle-icon
+            class="w-4 h-4 inline"
+            v-if="whipEndpointNotPersistent || sourcesNotPersistent"
+          />
+        </router-link>
+        <router-link :to="{ path: '/host', query }" v-if="!!auth" id="nav_host"
           >Host</router-link
         >
       </nav>
@@ -81,12 +77,8 @@ function report() {
     <main class="basis-full px-2">
       <slot></slot>
     </main>
-    <footer
-      class="w-full mt-8 mb-4 mx-auto basis-auto"
-    >
-      <div
-        class="m:w-24 flex justify-evenly gap-4"
-      >
+    <footer class="w-full mt-8 mb-4 mx-auto basis-auto">
+      <div class="m:w-24 flex justify-evenly gap-4">
         <img
           src="~/assets/img/h264-logo.svg"
           alt="H264 logo"
@@ -99,7 +91,9 @@ function report() {
         />
       </div>
       <div class="text-end text-slate-700 text-sm">
-        <p>{{ pkg.version }}/rtckit <b>{{ rtckitver }}</b></p>
+        <p>
+          {{ pkg.version }}/rtckit <b>{{ rtckitver }}</b>
+        </p>
       </div>
     </footer>
   </div>
@@ -124,5 +118,4 @@ function report() {
     @apply text-slate-300;
   }
 }
-
 </style>

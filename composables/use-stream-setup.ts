@@ -1,63 +1,48 @@
-import type { StreamInfo } from "~/types/stream"
-import useStream from "./use-stream"
-import usePersistence from "./use-persistence";
+import type { StreamInfo } from "~/types/stream";
+import useStream from "./use-stream";
 
-const STREAM_NAME = 'My damn awesome WebRTC stream'
+const STREAM_NAME = "My damn awesome WebRTC stream";
 
-export default async function useStreamSetup(): Promise<Ref<StreamInfo>> {
-  const stream = useStream()
-  const url = useRequestURL();
-  const streamId = url.searchParams.get('stream_id');
-  const token = url.searchParams.get('stream_token');
-  const server = url.searchParams.get('server');
-  const sources = url.searchParams.get('sources')?.split(',') ?? [];
-  if (streamId && token) {
-    stream.value.id = parseInt(streamId, 10)
-    stream.value.whipEndpoint = buildWhipEndpoint(streamId, token, server || '')
-    stream.value.whepEndpoint = '' // TODO drop
-    stream.value.playerUrl = ''
-    stream.value.sources = sources
-  } else {
-    const persisted = usePersistence() // only the stream ID is used for persistence
-    const { data } = await fetchStream(persisted.value);
-    if (data.value) {
-      // @ts-ignore
-      persisted.value = data.value
+export default async function useStreamSetup() {
+  const stream = useStream();
+  const persisted = useCookie<StreamInfo>("stream");
+  const data = await fetchStream(persisted.value);
+  persisted.value = data;
+  console.log('useStreamSetup', data);
+  if (!stream.value.whipEndpoint) {
+    stream.value = {
+      ...data,
+      initialWhipEndpoint: data.whipEndpoint,
+      initialSources: data.sources,
     }
-    if (!persisted.value) {
-      throw new Error(
-        'Failed to create stream',
-      )
-    }
-    if (sources.length || !Array.isArray(persisted.value.sources)) {
-      persisted.value.sources = sources
-    }
-    stream.value = persisted.value
   }
-  return stream;
 }
 
-async function fetchStream(value: StreamInfo | undefined) {
-  if (!value || !value.id) {
-    return useFetch(
-      '/api/generate',
-      {
-        method: 'POST',
-        body: {
-          name: STREAM_NAME,
-        }
+async function fetchStream(value: StreamInfo | undefined): Promise<StreamInfo> {
+  if (!value) {
+    const { data } = await useFetch("/api/generate", {
+      method: "POST",
+      body: {
+        name: STREAM_NAME,
       },
-    )
+    });
+    if (!data.value) {
+      throw new Error("Failed to generate stream");
+    }
+    return data.value as StreamInfo;
   }
-  return useFetch('/api/keepalive', {
-    method: 'POST',
+  const { error, data, status } = await useFetch("/api/keepalive", {
+    method: "POST",
     body: {
       id: value.id,
       name: STREAM_NAME,
     },
-  })
-}
-
-function buildWhipEndpoint(streamId: string, token: string, hostname: string): string {
-  return `https://${hostname || 'whip.gvideo.co'}/${streamId}_${token}/whip`
+  });
+  if (error.value) {
+    throw new Error("Failed to keepalive stream");
+  }
+  if (data.value) {
+    return data.value as StreamInfo;
+  }
+  return value;
 }
