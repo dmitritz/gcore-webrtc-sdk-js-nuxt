@@ -4,7 +4,7 @@ import { reportError } from "@gcorevideo/utils";
 import {
   BugAntIcon,
   CheckIcon,
-  ExclamationTriangleIcon,
+  ExclamationCircleIcon,
 } from "@heroicons/vue/16/solid";
 import pkg from "../package.json";
 
@@ -64,7 +64,7 @@ function report() {
           id="nav_settings"
           :class="{ disabled: locked }"
           >Settings
-          <exclamation-triangle-icon
+          <exclamation-circle-icon
             class="w-4 h-4 inline"
             v-if="whipEndpointNotPersistent || sourcesNotPersistent"
           />
