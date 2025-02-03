@@ -16,9 +16,6 @@ export async function createWebrtcStream(
   name: string,
 ) {
   const webrtc = gcoreApi().webrtc
-  // webrtc.setCustomOptions({
-  //   ...
-  // })
   return await webrtc.createStream(name)
 }
 

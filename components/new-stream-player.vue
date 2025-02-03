@@ -23,7 +23,7 @@ onMounted(async () => {
       autoPlay: true,
       dash: {
         streaming: {
-          retryAttemptes: {
+          retryAttempts: {
             MPD: 100,
           },
           retryIntervals: {

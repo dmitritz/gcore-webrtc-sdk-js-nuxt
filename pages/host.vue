@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import {
   IngesterErrorHandler,
+  NetworkError,
+  ServerRequestError,
   StreamMeta,
   VideoResolutionChangeDetector,
   WebrtcStreamingEvents,
@@ -67,10 +69,16 @@ const ingesterError = ref("");
 const status = ref<Status>(Status.Initial);
 const videoQuality = ref(0);
 const qualityStatus = ref<QualityStatus>(QualityStatus.None);
+
+type Callback = () => void;
+const unmount = ref<Callback[]>([]);
+
 const showPlayer = import.meta.client
   ? new URL(location.href).searchParams.has("inline_player")
   : false;
-const NewPlayer = import.meta.client ? defineAsyncComponent(() => import("~/components/new-stream-player.vue")) : null;
+const NewPlayer = import.meta.client
+  ? defineAsyncComponent(() => import("~/components/new-stream-player.vue"))
+  : null;
 
 const hasValidMediaSources = computed(() => {
   return stream.value.sources.length > 0;
@@ -93,14 +101,34 @@ const canStart = computed(
 );
 
 onMounted(() => {
-  status.value = Status.ConnectingDevices;
+  status.value =
+    mediaDevices.value.cameraDevicesList.length ||
+    mediaDevices.value.micDevicesList.length
+      ? Status.Ready
+      : Status.ConnectingDevices;
   startUserMedia();
+});
+
+onBeforeUnmount(() => {
+  console.log("onBeforeUnmount");
+  for (const callback of unmount.value) {
+    try {
+      callback();
+    } catch (e) {
+      reportError(e);
+    }
+  }
 });
 
 watch(
   () =>
     mediaDevices.value.cameraDevicesList.map(({ deviceId }) => deviceId).join(),
-  () => {
+  (v: string) => {
+    console.log(
+      "cameraDevicesList changed %s %o",
+      v,
+      mediaDevices.value.cameraDevicesList
+    );
     if (
       mediaDevices.value.cameraDevicesList.length &&
       status.value === Status.ConnectingDevices
@@ -196,7 +224,10 @@ function start() {
       });
     })
     .catch((e) => {
-      reportError(e)
+      reportError(e);
+      if (e instanceof ServerRequestError || e instanceof NetworkError) {
+        status.value = Status.ConnectionFailed;
+      }
       air.value.starting = false;
     });
 }
@@ -218,17 +249,19 @@ function restart() {
 
 function startUserMedia() {
   const w = webrtcStreaming.get();
-  w.on(WebrtcStreamingEvents.MediaDeviceSwitch, () =>
-    setTimeout(refreshDevicesList, 0)
-  );
-  w.on(WebrtcStreamingEvents.MediaDeviceSwitchOff, () =>
-    setTimeout(refreshDevicesList, 0)
-  );
+  w.on(WebrtcStreamingEvents.MediaDeviceSwitch, refreshDevicesList);
+  w.on(WebrtcStreamingEvents.MediaDeviceSwitchOff, refreshDevicesList);
 
   function refreshDevicesList() {
-    w.mediaDevices.reset();
-    updateDevicesList();
+    setTimeout(() => {
+      w.mediaDevices.reset();
+      updateDevicesList();
+    }, 0);
   }
+  unmount.value.push(() => {
+    w.off(WebrtcStreamingEvents.MediaDeviceSwitch, refreshDevicesList);
+    w.off(WebrtcStreamingEvents.MediaDeviceSwitchOff, refreshDevicesList);
+  });
 }
 
 async function updateDevicesList() {

@@ -18,7 +18,7 @@ export default async function useStreamSetup(): Promise<Ref<StreamInfo>> {
     stream.value.playerUrl = ''
     stream.value.sources = sources
   } else {
-    const persisted = usePersistence()
+    const persisted = usePersistence() // only the stream ID is used for persistence
     const { data } = await fetchStream(persisted.value);
     if (data.value) {
       // @ts-ignore
