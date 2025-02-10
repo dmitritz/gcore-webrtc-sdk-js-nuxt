@@ -18,4 +18,9 @@ export default defineNuxtConfig({
       appVersion: '',
     },
   },
+  vite: {
+    ssr: {
+      noExternal: ['sdp-transform'],
+    }
+  }
 })

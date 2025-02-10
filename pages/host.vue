@@ -12,6 +12,7 @@ import type {
   MediaDeviceSwitchInfo,
   MediaDeviceSwitchOffInfo,
 } from "@gcorevideo/rtckit";
+import { trace } from "@gcorevideo/utils";
 
 import { getIngesterErrorReasonExplanation } from "~/utils/errors";
 
@@ -124,10 +125,11 @@ watch(
   () =>
     mediaDevices.value.cameraDevicesList.map(({ deviceId }) => deviceId).join(),
   (v: string) => {
-    console.log(
-      "cameraDevicesList changed %s %o",
-      v,
-      mediaDevices.value.cameraDevicesList
+    trace(
+      "cameraDevicesList changed", {
+        v,
+        cameraDevicesList: mediaDevices.value.cameraDevicesList,
+      }
     );
     if (
       mediaDevices.value.cameraDevicesList.length &&

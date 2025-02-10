@@ -3,6 +3,7 @@ import { StreamMeta, WebrtcStreaming, type WebrtcStreamingOptions, type WhipClie
 let webrtc: WebrtcStreaming | null = null
 
 const baseOptions = {
+  mediaDevicesAutoSwitch: true,
   plugins: [
     new StreamMeta(),
   ]
@@ -24,7 +25,7 @@ function useWebrtcStreaming() {
     },
     get(): WebrtcStreaming {
       if (!webrtc) {
-        webrtc = new WebrtcStreaming("")
+        webrtc = new WebrtcStreaming("", baseOptions)
       }
       return webrtc
     },
