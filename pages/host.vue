@@ -180,6 +180,7 @@ function start() {
     } else if (e.kind === "video") {
       cameraSwitched.value = e;
     }
+    w.openSourceStream().then(s => userMedia.value.stream = s).catch(e => reportError(e))
     setTimeout(() => {
       if (e.kind === "audio") {
         micSwitched.value = null;
