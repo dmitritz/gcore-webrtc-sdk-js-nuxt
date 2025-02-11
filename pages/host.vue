@@ -54,6 +54,8 @@ enum QualityStatus {
   Improved,
 }
 
+const T = 'pages.host'
+
 const micSwitched = ref<MediaDeviceSwitchInfo | null>(null);
 const cameraSwitched = ref<MediaDeviceSwitchInfo | null>(null);
 const micSwitchedOff = ref<MediaDeviceSwitchOffInfo | null>(null);
@@ -249,19 +251,31 @@ function restart() {
 
 function startUserMedia() {
   const w = webrtcStreaming.get();
-  w.on(WebrtcStreamingEvents.MediaDeviceSwitch, refreshDevicesList);
-  w.on(WebrtcStreamingEvents.MediaDeviceSwitchOff, refreshDevicesList);
+  w.on(WebrtcStreamingEvents.MediaDeviceSwitch, onMdSwitch);
+  w.on(WebrtcStreamingEvents.MediaDeviceSwitchOff, onMdSwitch);
 
-  function refreshDevicesList() {
-    setTimeout(() => {
-      w.mediaDevices.reset();
-      updateDevicesList();
-    }, 0);
-  }
   unmount.value.push(() => {
-    w.off(WebrtcStreamingEvents.MediaDeviceSwitch, refreshDevicesList);
-    w.off(WebrtcStreamingEvents.MediaDeviceSwitchOff, refreshDevicesList);
+    w.off(WebrtcStreamingEvents.MediaDeviceSwitch, onMdSwitch);
+    w.off(WebrtcStreamingEvents.MediaDeviceSwitchOff, onMdSwitch);
   });
+}
+
+function onMdSwitch() {
+  trace(`${T} onMdSwitch`);
+  setTimeout(() => {
+    const w = webrtcStreaming.get();
+    w.mediaDevices.reset();
+    updateDevicesList();
+    w.openSourceStream()
+      .then((s) => {
+        trace(`${T} onMdSwitch.openSourceStream`, {
+          id: s.id,
+          video: s.getVideoTracks()[0]?.label,
+        });
+        userMedia.value.stream = s;
+      })
+    .catch((e) => reportError(e));
+  }, 0);
 }
 
 async function updateDevicesList() {
@@ -289,7 +303,7 @@ async function updateDevicesList() {
             </camera-preview>
             <mic-control />
           </div>
-          <div class="block my-2 flex gap-2 items-center">
+          <div class="my-2 flex gap-2 items-center">
             <button
               @click="start"
               v-if="canStart"
@@ -316,7 +330,7 @@ async function updateDevicesList() {
           </div>
         </div>
         <div
-          class="block my-2 justify-center flex flex-col gap-2 text-center md:basis-1/2 lg:basis-1/3"
+          class="my-2 justify-center flex flex-col gap-2 text-center md:basis-1/2 lg:basis-1/3"
         >
           <div>
             <div class="text-slate-900" id="streaming_status">

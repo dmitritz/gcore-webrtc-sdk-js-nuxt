@@ -7,7 +7,7 @@ export default defineEventHandler(async function (event) {
   let baseTime = records[0].time
   for (const { message, detail, time } of records) {
     const d = time - baseTime
-    const t = d ? `+${ms(d)}` : ''
+    const t = d ? `+${ms(d)}` : new Date(time).toLocaleTimeString()
     const tokens = formatTokens({
       ...tags,
       ...detail,

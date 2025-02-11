@@ -1,13 +1,8 @@
 <script setup lang="ts">
-import {
-  WebrtcStreamingEvents,
-  type MediaDeviceSwitchInfo,
-} from "@gcorevideo/rtckit";
 import { SignalIcon, SignalSlashIcon } from "@heroicons/vue/16/solid";
 
 const mediaDevices = useMediaDevices();
 const userMedia = useUserMedia();
-const webrtcStreaming = useWebrtcStreaming();
 
 const showPreviewLabel = false;
 
@@ -16,40 +11,28 @@ defineProps<{
   live?: boolean;
 }>();
 
+const T = "components.camera-preview";
+
 const frameSize = useFrameSize();
 const video = ref<HTMLVideoElement | null>(null);
 
 watch([() => userMedia.value.stream, video], ([s, v]) => {
   if (!v) return;
+  if (v.srcObject) {
+    if (v.srcObject === s) {
+      return;
+    }
+    v.pause();
+    v.srcObject = null;
+  }
   if (s) {
     v.srcObject = s;
     v.play().catch((e) => {
+      reportError(e);
       console.error("Video element play", e);
     });
-  } else {
-    v.srcObject = null;
   }
 });
-
-onMounted(() => {
-  const w = webrtcStreaming.get();
-  w.on(WebrtcStreamingEvents.MediaDeviceSwitch, onMdSwitch);
-  w.on(WebrtcStreamingEvents.MediaDeviceSwitchOff, onMdSwitch);
-});
-
-onBeforeUnmount(() => {
-  const w = webrtcStreaming.get();
-  w.off(WebrtcStreamingEvents.MediaDeviceSwitch, onMdSwitch);
-  w.off(WebrtcStreamingEvents.MediaDeviceSwitchOff, onMdSwitch);
-});
-
-function onMdSwitch() {
-  webrtcStreaming
-    .get()
-    .openSourceStream()
-    .then((s) => (userMedia.value.stream = s))
-    .catch((e) => reportError(e));
-}
 </script>
 
 <template>
