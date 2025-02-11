@@ -125,12 +125,10 @@ watch(
   () =>
     mediaDevices.value.cameraDevicesList.map(({ deviceId }) => deviceId).join(),
   (v: string) => {
-    trace(
-      "cameraDevicesList changed", {
-        v,
-        cameraDevicesList: mediaDevices.value.cameraDevicesList,
-      }
-    );
+    trace("cameraDevicesList changed", {
+      v,
+      cameraDevicesList: mediaDevices.value.cameraDevicesList,
+    });
     if (
       mediaDevices.value.cameraDevicesList.length &&
       status.value === Status.ConnectingDevices
@@ -180,7 +178,6 @@ function start() {
     } else if (e.kind === "video") {
       cameraSwitched.value = e;
     }
-    w.openSourceStream().then(s => userMedia.value.stream = s).catch(e => reportError(e))
     setTimeout(() => {
       if (e.kind === "audio") {
         micSwitched.value = null;
