@@ -14,7 +14,7 @@
     "@fingerprintjs/fingerprintjs": "^4.5.1",
     "@gcorevideo/player": "^2.9.0",
     "@gcorevideo/player-plugins": "^0.8.0",
-    "@gcorevideo/rtckit": "^0.89.6",
+    "@gcorevideo/rtckit": "^0.89.7",
     "@gcorevideo/rtckit-node": "^0.14.1",
     "@gcorevideo/utils": "^0.6.0",
     "@heroicons/vue": "^2.1.5",
