@@ -241,6 +241,8 @@ function leave() {
   if (userMedia.value.stream) {
     closeMediaStream(userMedia.value.stream);
     userMedia.value.stream = null;
+    userMedia.value.audioTrack = null;
+    userMedia.value.videoTrack = null;
   }
   status.value = Status.Ended;
 }
@@ -273,6 +275,13 @@ function onMdSwitch() {
           video: s.getVideoTracks()[0]?.label,
         });
         userMedia.value.stream = s;
+        s.getTracks().forEach((t) => {
+          if (t.kind === "audio") {
+            userMedia.value.audioTrack = t;
+          } else if (t.kind === "video") {
+            userMedia.value.videoTrack = t;
+          }
+        });
       })
     .catch((e) => reportError(e));
   }, 0);

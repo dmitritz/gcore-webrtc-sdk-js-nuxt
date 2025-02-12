@@ -3,6 +3,8 @@ import useStream from "./use-stream";
 
 const STREAM_NAME = "My damn awesome WebRTC stream";
 
+// TODO importing JSON
+
 export default async function useStreamSetup() {
   const stream = useStream();
   const persisted = useCookie<StreamInfo>("stream");
