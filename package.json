@@ -2,7 +2,7 @@
   "name": "gcore-webrtc-ingest-demo-vercel",
   "private": true,
   "type": "module",
-  "version": "0.6.8",
+  "version": "0.6.9",
   "scripts": {
     "build": "VITE_SENTRY_BUILD_ID=$VERCEL_GIT_COMMIT_SHA nuxt build",
     "dev": "nuxt dev",
