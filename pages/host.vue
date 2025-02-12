@@ -264,7 +264,7 @@ function onMdSwitch() {
   trace(`${T} onMdSwitch`);
   setTimeout(() => {
     const w = webrtcStreaming.get();
-    w.mediaDevices.reset();
+    // w.mediaDevices.reset(); // TODO check, it's done by WebrtcStreaming
     updateDevicesList();
     w.openSourceStream()
       .then((s) => {

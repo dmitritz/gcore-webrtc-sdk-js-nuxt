@@ -1,7 +1,7 @@
 import type { WebrtcStreamParams } from "@gcorevideo/rtckit";
 
 export default function useMediaDevicesReconfigure() {
-  const state = useUserMedia();
+  const userMedia = useUserMedia();
   const mediaDevices = useMediaDevices(); // TODO module-level
   const webrtcStreaming = useWebrtcStreaming();
   const timerId = useState<ReturnType<typeof setTimeout> | null>(
@@ -30,9 +30,9 @@ export default function useMediaDevicesReconfigure() {
   });
 
   function closeTracks() {
-    state.value.stream = null;
-    state.value.audioTrack = null;
-    state.value.videoTrack = null;
+    userMedia.value.stream = null;
+    userMedia.value.audioTrack = null;
+    userMedia.value.videoTrack = null;
   }
 
   async function openSourceStream() {
@@ -45,26 +45,26 @@ export default function useMediaDevicesReconfigure() {
     }
     try {
       const s = await webrtcStreaming.get().openSourceStream(constraints.value);
-      state.value.stream = s;
+      userMedia.value.stream = s;
       s.getTracks().forEach((track: MediaStreamTrack) => {
         if (track.kind === "audio") {
-          state.value.audioTrack = track;
+          userMedia.value.audioTrack = track;
           track.addEventListener("ended", () => {
-            if (state.value.audioTrack === track) {
-              state.value.audioTrack = null;
+            if (userMedia.value.audioTrack === track) {
+              userMedia.value.audioTrack = null;
             }
           });
         } else {
-          state.value.videoTrack = track;
+          userMedia.value.videoTrack = track;
           track.addEventListener("ended", () => {
-            if (state.value.videoTrack === track) {
-              state.value.videoTrack = null;
+            if (userMedia.value.videoTrack === track) {
+              userMedia.value.videoTrack = null;
             }
           });
         }
       });
     } catch (e) {
-      state.value.error = String(e);
+      userMedia.value.error = String(e);
     }
   }
 
