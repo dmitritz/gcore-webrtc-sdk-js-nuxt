@@ -50,10 +50,10 @@ function report() {
       <nav class="my-2 flex gap-2 mb-4">
         <router-link
           :to="{ path: '/', query }"
-          id="nav_home"
+          id="nav_host"
           class="r"
           :class="{ disabled: locked }"
-          >Home</router-link
+          >Host</router-link
         >
         <router-link
           :to="{
