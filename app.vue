@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import pkg from './package.json' with { type: 'json' }
 import rtckit from '@gcorevideo/rtckit/package.json' with { type: 'json' }
 import rtckitNode from '@gcorevideo/rtckit-node/package.json' with { type: 'json' }
+import pkg from './package.json' with { type: 'json' }
+
 import { setTracer } from "@gcorevideo/rtckit";
+import { setTracer as setTracerPlayer, version as playerVersion } from "@gcorevideo/player";
+import { setTracer as setTracerPlayerPlugins } from "@gcorevideo/player-plugins";
+
 import { RemoteTracer, SentryTracer } from "@gcorevideo/utils";
 import * as Sentry from '@sentry/browser'
+
 import Fingerprint from '@fingerprintjs/fingerprintjs'
 
 if (import.meta.client) {
@@ -13,6 +18,7 @@ if (import.meta.client) {
     build_id: import.meta.env.VITE_SENTRY_BUILD_ID,
     rtckit: rtckit.version,
     rtckit_node: rtckitNode.version,
+    player: playerVersion().gplayer,
   }
   const client = Sentry.init({
     debug: true,
@@ -43,6 +49,8 @@ if (import.meta.client) {
       // height: Browser.viewport.height,
     })
     setTracer(tracer)
+    setTracerPlayer(tracer)
+    setTracerPlayerPlugins(tracer)
     Fingerprint.load()
       .then((agent) => agent.get())
       .then((res) => {

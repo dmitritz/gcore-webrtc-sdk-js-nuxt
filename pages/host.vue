@@ -424,22 +424,12 @@ async function updateDevicesList() {
 <style scoped>
 @tailwind components;
 
-@layer components {
-  .statusRunning {
-    @apply text-red-900;
-  }
-}
-
 .btn {
-  background-color: #000;
-  border-radius: 3px;
+  @apply bg-black rounded-3px text-white uppercase font-bold;
   background-image: url("/img/slick-bg.svg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-  color: #fff;
-  text-transform: uppercase;
-  font-weight: bold;
 }
 
 .stream-quality.degraded {
