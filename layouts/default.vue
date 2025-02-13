@@ -9,7 +9,6 @@ import {
 import pkg from "../package.json";
 
 const air = useAir();
-const auth = useAuth();
 const route = useRoute();
 const query = route.query;
 const locked = computed(() => route.path === "/host" && air.value.live);
@@ -69,9 +68,6 @@ function report() {
             v-if="whipEndpointNotPersistent || sourcesNotPersistent"
           />
         </router-link>
-        <router-link :to="{ path: '/host', query }" v-if="!!auth" id="nav_host"
-          >Host</router-link
-        >
       </nav>
     </header>
     <main class="basis-full px-2">
@@ -100,22 +96,20 @@ function report() {
 </template>
 
 <style scoped>
-@tailwind components;
+@import "tailwindcss";
 
-@layer components {
-  nav a {
-    text-decoration: none;
-    text-transform: lowercase;
-    @apply rounded py-1 px-2;
-    @apply text-orange-500 hover:text-orange-500 bg-transparent;
-  }
-  .router-link-active {
-    cursor: default;
-    @apply text-slate-700 hover:text-slate-700 bg-slate-100;
-  }
-  .disabled {
-    pointer-events: none;
-    @apply text-slate-300;
-  }
+nav a {
+  text-decoration: none;
+  text-transform: lowercase;
+  @apply rounded py-1 px-2;
+  @apply text-orange-500 hover:text-orange-500 bg-transparent;
+}
+.router-link-active {
+  cursor: default;
+  @apply text-slate-700 hover:text-slate-700 bg-slate-100;
+}
+.disabled {
+  pointer-events: none;
+  @apply text-slate-300;
 }
 </style>

@@ -7,7 +7,6 @@ import {
 } from "@gcorevideo/player-plugins";
 
 import { TvIcon, SignalIcon, SignalSlashIcon } from "@heroicons/vue/24/outline";
-import useStream from "~/composables/use-stream";
 
 Player.registerPlugin(ErrorScreen);
 Player.registerPlugin(SourceController);
@@ -16,8 +15,8 @@ Player.registerPlugin(SpinnerThreeBounce);
 const container = ref<HTMLDivElement>();
 const playing = ref(false);
 
-onMounted(async () => {
-  const stream = await useStream();
+onMounted(() => {
+  const stream = useStream();
   setTimeout(() => {
     const player = new Player({
       autoPlay: true,

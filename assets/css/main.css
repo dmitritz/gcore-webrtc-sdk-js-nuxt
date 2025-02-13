@@ -1,7 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind interactivity;
-@tailwind utilities;
+@import "tailwindcss";
 
 a {
   text-decoration: underline;

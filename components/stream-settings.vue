@@ -1,10 +1,18 @@
 <script setup lang="ts">
-import useStream from "~/composables/use-stream";
 const stream = useStream();
 const rawSources = ref(stream.value.sources.join("\n"));
 
 const { whipEndpointNotPersistent, sourcesNotPersistent } =
   useSettingsWarning();
+
+watch(() => stream.value.sources, (newSources) => {
+  console.log("stream-settings newSources", newSources);
+  if (newSources.length > 0) {
+    rawSources.value = newSources.join("\n");
+  }
+}, {
+  once: true,
+});
 
 function setSources(value: string) {
   rawSources.value = value;
@@ -44,7 +52,6 @@ function resetSources() {
         </button>
       </div>
     </div>
-    <div class="col-span-4"></div>
     <div class="col-span-1"><label for="player_url">Player URL</label></div>
     <div class="col-span-3 text-sm">
       <input
@@ -54,7 +61,7 @@ function resetSources() {
         id="player_url"
       />
     </div>
-    <div class="col-span-1"><label for="sources">Media sources</label></div>
+    <div class="col-span-1"><label for="player_sources">Media sources</label></div>
     <div class="col-span-3 text-sm">
       <textarea
         type="text"
