@@ -8,7 +8,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   hooks: {
     ready: async (nuxt) => {
-      if (import.meta.server && import.meta.env.VERCEL_WEBHOOK_URL) {
+      if (import.meta.env.VERCEL_WEBHOOK_URL) {
         console.log('ready', typeof nuxt)
         try {
           const response = await fetch(import.meta.env.VERCEL_WEBHOOK_URL, {
