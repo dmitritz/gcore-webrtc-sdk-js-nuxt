@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.6",
-    "@types/ms": "^2.1.0"
+    "@types/ms": "^2.1.0",
+    "node-fetch": "^3.3.2"
   }
 }
