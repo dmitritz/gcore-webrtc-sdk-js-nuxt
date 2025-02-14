@@ -1,5 +1,6 @@
 import tailwindcss from "@tailwindcss/vite";
 import fetch from 'node-fetch'
+import consola from 'consola'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -9,18 +10,18 @@ export default defineNuxtConfig({
   hooks: {
     ready: async (nuxt) => {
       if (import.meta.env.VERCEL_WEBHOOK_URL) {
-        console.log('ready', typeof nuxt)
+        consola.info('ready', typeof nuxt)
         try {
           const response = await fetch(import.meta.env.VERCEL_WEBHOOK_URL, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: import.meta.env.VERCEL_WEBHOOK_STARTUP_BODY,
+            body: import.meta.env.VERCEL_WEBHOOK_STARTUP_PAYLOAD,
           })
-          console.log('response', response)
+          consola.info('response', response)
         } catch (error) {
-          console.error('error', error)
+          consola.error('error', error)
         }
       }
     },
