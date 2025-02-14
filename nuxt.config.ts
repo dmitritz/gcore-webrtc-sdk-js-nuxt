@@ -10,7 +10,7 @@ export default defineNuxtConfig({
   hooks: {
     ready: async (nuxt) => {
       if (import.meta.env.VERCEL_WEBHOOK_URL) {
-        consola.info('ready', typeof nuxt)
+        consola.info('Ready region:%s deployment:%s', import.meta.env.VERCEL_REGION, import.meta.env.VERCEL_DEPLOYMENT_ID)
         try {
           const response = await fetch(import.meta.env.VERCEL_WEBHOOK_URL, {
             method: 'POST',
@@ -19,9 +19,9 @@ export default defineNuxtConfig({
             },
             body: import.meta.env.VERCEL_WEBHOOK_STARTUP_PAYLOAD,
           })
-          consola.info('response', response)
+          consola.info('OK')
         } catch (error) {
-          consola.error('error', error)
+          consola.error('ERROR %s', String(error))
         }
       }
     },
