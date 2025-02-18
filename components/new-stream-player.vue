@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { Player, PlayerEvent } from "@gcorevideo/player";
 import {
   ErrorScreen,
+  Player, PlayerEvent,
   SourceController,
   SpinnerThreeBounce,
-} from "@gcorevideo/player-plugins";
+} from "@gcorevideo/player";
 
 import { TvIcon, SignalIcon, SignalSlashIcon } from "@heroicons/vue/24/outline";
 
@@ -29,6 +29,13 @@ onMounted(() => {
             MPD: 1000,
           },
         },
+      },
+      playback: {
+        hlsjsConfig: {
+          lowLatencyMode: true,
+          liveSyncDurationCount: 0,
+          liveMaxLatencyDurationCount: 1,
+        }
       },
       debug: true,
       mute: true,

@@ -5,7 +5,6 @@ import pkg from './package.json' with { type: 'json' }
 
 import { setTracer } from "@gcorevideo/rtckit";
 import { setTracer as setTracerPlayer, version as playerVersion } from "@gcorevideo/player";
-import { setTracer as setTracerPlayerPlugins } from "@gcorevideo/player-plugins";
 
 import { RemoteTracer, SentryTracer } from "@gcorevideo/utils";
 import * as Sentry from '@sentry/browser'
@@ -50,7 +49,6 @@ if (import.meta.client) {
     })
     setTracer(tracer)
     setTracerPlayer(tracer)
-    setTracerPlayerPlugins(tracer)
     Fingerprint.load()
       .then((agent) => agent.get())
       .then((res) => {
