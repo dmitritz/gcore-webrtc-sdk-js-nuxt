@@ -4,6 +4,8 @@ import {
   Player, PlayerEvent,
   SourceController,
   SpinnerThreeBounce,
+  Telemetry,
+  type TelemetryRecord,
 } from "@gcorevideo/player";
 
 import { TvIcon, SignalIcon, SignalSlashIcon } from "@heroicons/vue/24/outline";
@@ -11,6 +13,7 @@ import { TvIcon, SignalIcon, SignalSlashIcon } from "@heroicons/vue/24/outline";
 Player.registerPlugin(ErrorScreen);
 Player.registerPlugin(SourceController);
 Player.registerPlugin(SpinnerThreeBounce);
+Player.registerPlugin(Telemetry);
 
 const container = ref<HTMLDivElement>();
 const playing = ref(false);
@@ -42,6 +45,23 @@ onMounted(() => {
       spinner: {
         showOnError: true,
         showOnStart: true,
+      },
+      telemetry: {
+        send: (record: TelemetryRecord) => {
+          // TODO buffer?
+          fetch('/api/stats', {
+            method: 'POST',
+            body: JSON.stringify({
+              records: [{
+                data: record,
+                time: Date.now(),
+              }]
+            }),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+        },
       },
       strings: {},
       sources: stream.value.sources,
