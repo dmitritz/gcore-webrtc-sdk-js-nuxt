@@ -76,9 +76,7 @@ const qualityStatus = ref<QualityStatus>(QualityStatus.None);
 type Callback = () => void;
 const unmount = ref<Callback[]>([]);
 
-const showPlayer = import.meta.client
-  ? new URL(location.href).searchParams.has("inline_player")
-  : false;
+const showPlayer = useInlinePlayer();
 const NewPlayer = import.meta.client
   ? defineAsyncComponent(() => import("~/components/new-stream-player.vue"))
   : null;
