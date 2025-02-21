@@ -1,7 +1,8 @@
 <script setup lang="ts">
 const stream = useStream();
 const rawSources = ref(stream.value.sources.join("\n"));
-
+const inlinePlayer = useInlinePlayer();
+const tuneHls = useTuneHls();
 const { whipEndpointNotPersistent, sourcesNotPersistent } =
   useSettingsWarning();
 
@@ -81,6 +82,23 @@ function resetSources() {
           Reset
         </button>
       </div>
+      <div v-if="inlinePlayer">
+        
+      </div>
     </div>
+    <template v-if="inlinePlayer">
+      <div class="col-span-1">
+        <label for="inline_player">
+          Tune HLS.js
+        </label>
+      </div>
+      <div class="col-span-3">
+        <input type="checkbox" id="inline_player" v-model="tuneHls" />
+        <div class="text-sm text-slate-600">
+          These experimental low latency settings can cause negative UX like playback stalls
+          and stuttering.
+        </div>
+      </div>
+    </template>
   </div>
 </template>

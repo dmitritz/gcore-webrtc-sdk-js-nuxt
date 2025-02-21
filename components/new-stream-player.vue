@@ -14,6 +14,7 @@ Player.registerPlugin(SpinnerThreeBounce);
 
 const container = ref<HTMLDivElement>();
 const playing = ref(false);
+const tuneHls = useTuneHls();
 
 onMounted(() => {
   const stream = useStream();
@@ -31,11 +32,10 @@ onMounted(() => {
         },
       },
       playback: {
-        hlsjsConfig: {
-          lowLatencyMode: true,
+        hlsjsConfig: tuneHls.value ? {
           liveSyncDurationCount: 0,
           liveMaxLatencyDurationCount: 1,
-        }
+        } : {}
       },
       debug: true,
       mute: true,
