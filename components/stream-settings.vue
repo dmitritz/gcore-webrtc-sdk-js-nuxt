@@ -7,7 +7,6 @@ const { whipEndpointNotPersistent, sourcesNotPersistent } =
   useSettingsWarning();
 
 watch(() => stream.value.sources, (newSources) => {
-  console.log("stream-settings newSources", newSources);
   if (newSources.length > 0) {
     rawSources.value = newSources.join("\n");
   }

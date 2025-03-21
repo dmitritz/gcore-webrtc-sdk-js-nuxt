@@ -52,8 +52,8 @@ if (import.meta.client) {
     Fingerprint.load()
       .then((agent) => agent.get())
       .then((res) => {
-        tracer.setTag('visitorId', res.visitorId)
-        sentryScope.setTag('visitorId', res.visitorId)
+        tracer.setTag('visitor_id', res.visitorId)
+        sentryScope.setTag('visitor_id', res.visitorId)
       })
   } else {
     console.error('Sentry client is not initialized')

@@ -111,7 +111,6 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  console.log("onBeforeUnmount");
   for (const callback of unmount.value) {
     try {
       callback();
