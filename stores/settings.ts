@@ -20,10 +20,10 @@ type Actions = {
 
 const DEFAULT_SETTINGS = {
     iceTransportPolicy: 'relay' as 'relay' | 'all',
-    iceHostCandidates: false,
     preferTcp: true,
     videoCodecs: ['H264'],
     canTrickleIce: true,
+    iceHostCandidates: false,
     godMode: false,
 }
 
