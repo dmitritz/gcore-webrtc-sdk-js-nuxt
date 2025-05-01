@@ -2,14 +2,17 @@
 import rtckit from '@gcorevideo/rtckit/package.json' with { type: 'json' }
 import rtckitNode from '@gcorevideo/rtckit-node/package.json' with { type: 'json' }
 import pkg from './package.json' with { type: 'json' }
-
 import { setTracer } from "@gcorevideo/rtckit";
 import { setTracer as setTracerPlayer, version as playerVersion } from "@gcorevideo/player";
-
-import { RemoteTracer, SentryTracer } from "@gcorevideo/utils";
+import { LogTracer, Logger, RemoteTracer, SentryTracer } from "@gcorevideo/utils";
 import * as Sentry from '@sentry/browser'
-
 import Fingerprint from '@fingerprintjs/fingerprintjs'
+import mousetrap from 'mousetrap'
+
+const $route = useRoute()
+
+const BIND_KEYS_NEXT = 'option+right'
+const BIND_KEYS_PREV = 'option+left'
 
 if (import.meta.client) {
   const tags = {
@@ -19,7 +22,7 @@ if (import.meta.client) {
     rtckit_node: rtckitNode.version,
     player: playerVersion().gplayer,
   }
-  const client = Sentry.init({
+  const client = import.meta.env.VITE_SENTRY_DSN ? Sentry.init({
     debug: true,
     dsn: import.meta.env.VITE_SENTRY_DSN,
     environment: import.meta.env.VITE_SENTRY_ENV,
@@ -30,11 +33,9 @@ if (import.meta.client) {
     integrations: [Sentry.browserTracingIntegration()],
     release: pkg.version,
     tracesSampleRate: 1.0,
-  })
-  if (client) {
-    const sentryScope = Sentry.getGlobalScope()
-    const st = new SentryTracer(client, sentryScope)
-    const tracer = new RemoteTracer(st, {
+  }) : null
+  const baseTracer = client ? new SentryTracer(client as any, Sentry.getGlobalScope() as any) : new LogTracer(pkg.name)
+  const tracer = new RemoteTracer(baseTracer, {
       // device: Browser.device?.replace(/ /g, '_'),
       // browser: Browser.name,
       // browser_ver: Browser.version,
@@ -49,15 +50,29 @@ if (import.meta.client) {
     })
     setTracer(tracer)
     setTracerPlayer(tracer)
+  if (client) {
     Fingerprint.load()
       .then((agent) => agent.get())
       .then((res) => {
         tracer.setTag('visitor_id', res.visitorId)
-        sentryScope.setTag('visitor_id', res.visitorId)
+        Sentry.getGlobalScope().setTag('visitor_id', res.visitorId)
       })
   } else {
-    console.error('Sentry client is not initialized')
+    console.log('Sentry client is not initialized')
+    Logger.enable(import.meta.env.VITE_DEBUG ?? '*')
   }
+  const routes = [
+    '/',
+    '/settings',
+  ]
+  mousetrap.bind(BIND_KEYS_NEXT, () => {
+    const next = (routes.findIndex((route) => route === $route.path) + 1) % routes.length
+    navigateTo(routes[next])
+  })
+  mousetrap.bind(BIND_KEYS_PREV, () => {
+    const next = (routes.findIndex((route) => route === $route.path) - 1 + routes.length) % routes.length
+    navigateTo(routes[next])
+  })
 }
 
 useStreamSetup()

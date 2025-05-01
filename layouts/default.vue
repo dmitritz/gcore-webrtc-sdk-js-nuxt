@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import pkg from "../package.json" with { type: 'json' }
 import { version as rtckitver } from "@gcorevideo/rtckit";
 import { reportError } from "@gcorevideo/utils";
 import {
@@ -6,15 +7,33 @@ import {
   CheckIcon,
   ExclamationCircleIcon,
 } from "@heroicons/vue/16/solid";
-import pkg from "../package.json";
+import mousetrap from 'mousetrap'
 
 const air = useAir();
 const route = useRoute();
 const query = route.query;
-const locked = computed(() => route.path === "/host" && air.value.live);
+const locked = computed(() => route.path === "/" && (air.value.live || air.value.starting));
 const reported = ref(false);
 const { whipEndpointNotPersistent, sourcesNotPersistent } =
-  useSettingsWarning();
+useSettingsWarning();
+const settings = useSettingsStore()
+const godModeNotification = ref(false)
+
+const KEYS_GODMODE = 'i d d q d'
+
+onMounted(() => {
+  mousetrap.bind(KEYS_GODMODE, () => {
+    if (settings.godMode) {
+      return
+  }
+  settings.setGodMode(true)
+  godModeNotification.value = true
+  setTimeout(() => {
+      godModeNotification.value = false
+    }, 3000)
+  })
+})
+
 function report() {
   reported.value = true;
   reportError(new Error("User reported error"));
@@ -48,14 +67,14 @@ function report() {
         </div>
       </div>
       <nav class="my-2 flex gap-2 mb-4">
-        <router-link
+        <nuxt-link
           :to="{ path: '/', query }"
           id="nav_host"
           class="r"
           :class="{ disabled: locked }"
-          >Host</router-link
+          >Host</nuxt-link
         >
-        <router-link
+        <nuxt-link
           :to="{
             path: '/settings',
             query,
@@ -67,7 +86,17 @@ function report() {
             class="w-4 h-4 inline"
             v-if="whipEndpointNotPersistent || sourcesNotPersistent"
           />
-        </router-link>
+        </nuxt-link>
+        <transition name="fade">
+          <nuxt-link
+            :to="{ path: '/extra', query }"
+            id="nav_extra"
+            class="r"
+            :class="{ disabled: locked }"
+            v-if="settings.godMode"
+            >Extra</nuxt-link
+          >
+        </transition>
       </nav>
     </header>
     <main class="basis-full px-2">
@@ -92,11 +121,14 @@ function report() {
         </p>
       </div>
     </footer>
+    <div v-if="godModeNotification" class="god-mode-notification fixed bottom-0 right-0 text-white py-3 px-6 uppercase text-xl font-bold">
+      God mode
+    </div>
   </div>
 </template>
 
 <style scoped>
-@import "tailwindcss";
+@reference "~/assets/css/main.css";
 
 nav a {
   text-decoration: none;
@@ -111,5 +143,26 @@ nav a {
 .disabled {
   pointer-events: none;
   @apply text-slate-300;
+}
+
+.god-mode-notification {
+  background-color: oklch(82.8% 0.189 84.429 / 67%);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition-delay: 0.1s;
+  transition-duration: 0.5s;
+  transition-property: opacity background-color;
+  transition-timing-function: ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+a.fade-enter-to {
+  @apply bg-orange-600 text-white;
 }
 </style>
