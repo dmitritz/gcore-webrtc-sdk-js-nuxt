@@ -12,14 +12,16 @@ import type {
   MediaDeviceSwitchInfo,
   MediaDeviceSwitchOffInfo,
 } from "@gcorevideo/rtckit";
+import { ArrowPathIcon } from "@heroicons/vue/24/outline";
 import { trace } from "@gcorevideo/utils";
+import mousetrap from "mousetrap";
 
 import { getIngesterErrorReasonExplanation } from "~/utils/errors";
 
 const DEVICE_SWITCH_NOTIFICATION_TIMEOUT = 5000;
 
 definePageMeta({
-  middleware: "auth",
+  middleware: ["auth"],
 });
 
 enum Status {
@@ -54,7 +56,7 @@ enum QualityStatus {
   Improved,
 }
 
-const T = 'pages.host'
+const T = "pages.host";
 
 const micSwitched = ref<MediaDeviceSwitchInfo | null>(null);
 const cameraSwitched = ref<MediaDeviceSwitchInfo | null>(null);
@@ -72,11 +74,12 @@ const ingesterError = ref("");
 const status = ref<Status>(Status.Initial);
 const videoQuality = ref(0);
 const qualityStatus = ref<QualityStatus>(QualityStatus.None);
+const settings = useSettingsStore();
 
 type Callback = () => void;
 const unmount = ref<Callback[]>([]);
 
-const showPlayer = useInlinePlayer();
+const showPlayer = ref(useInlinePlayer());
 const NewPlayer = import.meta.client
   ? defineAsyncComponent(() => import("~/components/new-stream-player.vue"))
   : null;
@@ -101,7 +104,28 @@ const canStart = computed(
   () => !!userMedia.value.videoTrack && !started.value && !air.value.starting
 );
 
+const canRestart = computed(() => air.value.ended);
+
+const BIND_KEYS_START = "option+.";
+const BIND_KEYS_LEAVE = "option+\\";
+const BIND_KEYS_RESTART = "option+r";
+const BIND_KEYS_TOGGLE_PLAYER = "option+p";
+
 onMounted(() => {
+  mousetrap.bind(BIND_KEYS_START, () => {
+    start();
+  });
+  mousetrap.bind(BIND_KEYS_LEAVE, () => {
+    leave();
+  });
+  mousetrap.bind(BIND_KEYS_RESTART, () => {
+    if (canRestart.value) {
+      restart();
+    }
+  });
+  mousetrap.bind(BIND_KEYS_TOGGLE_PLAYER, () => {
+    showPlayer.value = !showPlayer.value;
+  });
   status.value =
     mediaDevices.value.cameraDevicesList.length ||
     mediaDevices.value.micDevicesList.length
@@ -111,6 +135,10 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  mousetrap.unbind(BIND_KEYS_START);
+  mousetrap.unbind(BIND_KEYS_LEAVE);
+  mousetrap.unbind(BIND_KEYS_RESTART);
+  mousetrap.unbind(BIND_KEYS_TOGGLE_PLAYER);
   for (const callback of unmount.value) {
     try {
       callback();
@@ -118,6 +146,7 @@ onBeforeUnmount(() => {
       reportError(e);
     }
   }
+  webrtcStreaming.close();
 });
 
 watch(
@@ -147,10 +176,10 @@ function start() {
   ingesterError.value = "";
 
   const w = webrtcStreaming.configure(stream.value.whipEndpoint, {
-    canTrickleIce: true,
+    canTrickleIce: settings.canTrickleIce,
     debug: true,
-    icePreferTcp: true,
-    iceTransportPolicy: "relay",
+    icePreferTcp: settings.preferTcp,
+    iceTransportPolicy: settings.iceTransportPolicy,
     mediaDevicesAutoSwitch: true,
     plugins: [
       new IngesterErrorHandler((reason) => {
@@ -169,7 +198,7 @@ function start() {
         }
       }),
     ],
-    videoCodecs: ["H264"],
+    videoCodecs: ["H264"], // TODO settings
   });
   w.on(WebrtcStreamingEvents.MediaDeviceSwitch, (e) => {
     if (e.kind === "audio") {
@@ -245,7 +274,23 @@ function leave() {
 }
 
 function restart() {
-  window.location.reload();
+  air.value.live = false;
+  air.value.ended = false;
+  ingesterError.value = "";
+  // mediaDevices.value.micDeviceId = "";
+  // mediaDevices.value.cameraDeviceId = "";
+  qualityStatus.value = QualityStatus.None;
+  videoQuality.value = 0;
+  webrtcStreaming.close();
+  status.value = Status.Initial;
+  setTimeout(() => {
+    status.value = Status.ConnectingDevices;
+    reopenMediaStream()
+      .then(() => {
+        status.value = Status.Ready;
+      })
+      .catch((e) => reportError(e));
+  }, 0);
 }
 
 function startUserMedia() {
@@ -262,26 +307,28 @@ function startUserMedia() {
 function onMdSwitch() {
   trace(`${T} onMdSwitch`);
   setTimeout(() => {
-    const w = webrtcStreaming.get();
-    // w.mediaDevices.reset(); // TODO check, it's done by WebrtcStreaming
-    updateDevicesList();
-    w.openSourceStream()
-      .then((s) => {
-        trace(`${T} onMdSwitch.openSourceStream`, {
-          id: s.id,
-          video: s.getVideoTracks()[0]?.label,
-        });
-        userMedia.value.stream = s;
-        s.getTracks().forEach((t) => {
-          if (t.kind === "audio") {
-            userMedia.value.audioTrack = t;
-          } else if (t.kind === "video") {
-            userMedia.value.videoTrack = t;
-          }
-        });
-      })
-    .catch((e) => reportError(e));
+    reopenMediaStream().catch((e) => reportError(e));
   }, 0);
+}
+
+function reopenMediaStream() {
+  const w = webrtcStreaming.get();
+  // w.mediaDevices.reset(); // TODO check, it's done by WebrtcStreaming
+  updateDevicesList();
+  return w.openSourceStream().then((s) => {
+    trace(`${T} onMdSwitch.openSourceStream`, {
+      id: s.id,
+      video: s.getVideoTracks()[0]?.label,
+    });
+    userMedia.value.stream = s;
+    s.getTracks().forEach((t) => {
+      if (t.kind === "audio") {
+        userMedia.value.audioTrack = t;
+      } else if (t.kind === "video") {
+        userMedia.value.videoTrack = t;
+      }
+    });
+  });
 }
 
 async function updateDevicesList() {
@@ -303,8 +350,8 @@ async function updateDevicesList() {
               :live="air.live"
               :ended="air.ended"
             >
-              <a @click.prevent="restart" href="#" v-if="air.ended" id="reload"
-                >reload</a
+              <a @click.prevent="restart" href="#" v-if="canRestart" id="reload"
+                ><arrow-path-icon class="w-4 h-4" /> reload</a
               >
             </camera-preview>
             <mic-control />
@@ -338,10 +385,18 @@ async function updateDevicesList() {
         <div
           class="my-2 justify-center flex flex-col gap-2 text-center md:basis-1/2 lg:basis-1/3"
         >
-          <div>
+          <div class="flex items-center flex-col">
             <div class="text-slate-900" id="streaming_status">
               {{ statusName }}
             </div>
+            <a
+              @click.prevent="restart"
+              href="#"
+              v-if="canRestart"
+              id="status_reload"
+              class="flex items-center gap-1"
+              ><arrow-path-icon class="w-4 h-4" /> reload</a
+            >
           </div>
           <div class="text-slate-900">
             Quality:
@@ -414,12 +469,28 @@ async function updateDevicesList() {
           <new-player v-if="air.live && showPlayer && hasValidMediaSources" />
         </div>
       </div>
+      <div
+        class="my-2 flex flex-col items-start gap-1 text-sm mt-4"
+        v-if="settings.godMode"
+      >
+        <div class="text-slate-900 font-semibold w-1">Endpoint</div>
+        <code class="text-pink-800 bg-red-50 py-1 px-2 rounded-xs">{{
+          stream.whipEndpoint
+        }}</code>
+        <div class="text-slate-900 font-semibold">Stream URL</div>
+        <code
+          v-for="s of stream.sources"
+          :key="s"
+          class="text-pink-800 bg-red-50 py-1 px-2 rounded-xs"
+          >{{ s }}</code
+        >
+      </div>
     </nuxt-layout>
   </div>
 </template>
 
 <style scoped>
-@import "tailwindcss";
+@reference "~/assets/css/main.css";
 
 .btn {
   @apply bg-black rounded rounded-xs text-white uppercase font-bold;

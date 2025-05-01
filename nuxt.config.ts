@@ -7,6 +7,7 @@ export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
   css: ["~/assets/css/main.css", "@gcorevideo/player/dist/plugins/index.css"],
   devtools: { enabled: true },
+
   hooks: {
     ready: async (nuxt) => {
       if (import.meta.env.VERCEL_WEBHOOK_URL) {
@@ -26,6 +27,7 @@ export default defineNuxtConfig({
       }
     },
   },
+
   runtimeConfig: {
     apiHost: "",
     // Key to access Gcore API https://api.gcore.com/docs/iam#section/Authentication/APIKey,
@@ -35,8 +37,12 @@ export default defineNuxtConfig({
       appVersion: "",
     },
   },
+
   ssr: false,
+
   vite: {
     plugins: [tailwindcss()],
   },
+
+  modules: ['@pinia/nuxt'],
 });

@@ -10,6 +10,9 @@ export default async function useStreamSetup() {
   const persisted = useCookie<StreamInfo>("stream");
   const data = await fetchStream(persisted.value);
   persisted.value = data;
+  if (!stream.value.initialWhipEndpoint) {
+    stream.value.initialWhipEndpoint = stream.value.whipEndpoint || data.whipEndpoint;
+  }
   if (!stream.value.whipEndpoint) {
     stream.value = {
       ...data,
