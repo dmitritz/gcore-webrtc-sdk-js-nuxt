@@ -10,6 +10,7 @@ import Fingerprint from '@fingerprintjs/fingerprintjs'
 import mousetrap from 'mousetrap'
 
 const $route = useRoute()
+const air = useAir()
 
 const BIND_KEYS_NEXT = 'option+right'
 const BIND_KEYS_PREV = 'option+left'
@@ -64,15 +65,21 @@ if (import.meta.client) {
   const routes = [
     '/',
     '/settings',
+    // TODO extra in godMode
   ]
   mousetrap.bind(BIND_KEYS_NEXT, () => {
-    const next = (routes.findIndex((route) => route === $route.path) + 1) % routes.length
-    navigateTo(routes[next])
+    navigateTabs(1)
   })
   mousetrap.bind(BIND_KEYS_PREV, () => {
-    const next = (routes.findIndex((route) => route === $route.path) - 1 + routes.length) % routes.length
-    navigateTo(routes[next])
+    navigateTabs(-1)
   })
+  function navigateTabs(delta: number) {
+    const next = (routes.findIndex((route) => route === $route.path) + delta + routes.length) % routes.length
+    if (air.value.live) {
+      return
+    }
+    navigateTo(routes[next])
+  }
 }
 
 useStreamSetup()
