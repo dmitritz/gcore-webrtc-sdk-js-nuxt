@@ -131,6 +131,7 @@ onMounted(() => {
     mediaDevices.value.micDevicesList.length
       ? Status.Ready
       : Status.ConnectingDevices;
+  // TODO check ready status
   startUserMedia();
 });
 
@@ -167,6 +168,9 @@ watch(
 );
 
 function start() {
+  if (air.value.starting || air.value.live) {
+    return;
+  }
   const s = userMedia.value.stream;
   if (!s) {
     return;
@@ -185,7 +189,9 @@ function start() {
       new IngesterErrorHandler((reason) => {
         ingesterError.value = getIngesterErrorReasonExplanation(reason);
       }),
-      new StreamMeta(),
+      new StreamMeta({
+        amp_times: settings.replication,
+      }),
       new VideoResolutionChangeDetector(({ degraded, height }) => {
         videoQuality.value = height;
         if (degraded) {
@@ -246,6 +252,7 @@ function start() {
         }
       });
       client.on(WhipClientEvents.ConnectionFailed, () => {
+        trace(`${T} WhipClientEvents.ConnectionFailed`);
         air.value.starting = false;
         air.value.live = false;
         status.value = Status.ConnectionFailed;
@@ -276,6 +283,7 @@ function leave() {
 function restart() {
   air.value.live = false;
   air.value.ended = false;
+  air.value.starting = false;
   ingesterError.value = "";
   // mediaDevices.value.micDeviceId = "";
   // mediaDevices.value.cameraDeviceId = "";
@@ -362,6 +370,7 @@ async function updateDevicesList() {
               v-if="canStart"
               class="px-4 py-1 btn"
               id="start"
+              :disabled="status !== Status.Ready"
             >
               Start
             </button>

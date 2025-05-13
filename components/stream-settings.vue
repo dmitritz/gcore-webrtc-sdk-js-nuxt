@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import mousetrap from "mousetrap";
-import { ServerIcon } from "@heroicons/vue/24/outline";
+
+import { useSettingsStore } from "~/stores/settings";
+
+const BIND_KEYS_WHIP_ENDPOINT_FOCUS = "option+.";
+const BIND_KEYS_WHIP_ENDPOINT_STORE = "option+s";
+const BIND_KEYS_WHIP_ENDPOINT_RESTORE = "option+r";
+const BIND_KEYS_WHIP_ENDPOINT_RESET = "option+z";
+
+const LS_KEY_WHIP_ENDPOINT = "webrtc.settings.whipEndpoint";
+const LS_KEY_WHIP_ENDPOINT_STACK = "webrtc.settings.whipEndpointStack";
 
 const stream = useStream();
 const rawSources = ref(stream.value.sources.join("\n"));
@@ -9,20 +18,28 @@ const tuneHls = useTuneHls();
 const { whipEndpointNotPersistent, sourcesNotPersistent } =
   useSettingsWarning();
 const whipEndpointInput = useTemplateRef<HTMLInputElement>("whipEndpointInput");
+const settings = useSettingsStore();
+const endpoints = ref<string[]>([]);
 
-const BIND_KEYS_FOCUS_WHIP_ENDPOINT = "option+."
-
-const LS_KEY_WHIP_ENDPOINT = "webrtc.settings.whipEndpoint";
-
-const storedEndpoint = ref(
-  localStorage.getItem(LS_KEY_WHIP_ENDPOINT) ?? ""
-);
+const storedEndpoint = ref(localStorage.getItem(LS_KEY_WHIP_ENDPOINT) ?? "");
+const currentEndpoint = computed(() => {
+  return stream.value.whipEndpoint.trim();
+});
 const canRestoreWhipEndpoint = computed(() => {
-  const v = stream.value.whipEndpoint.trim();
+  const v = currentEndpoint.value;
   return storedEndpoint.value.length > 0 && v !== storedEndpoint.value;
 });
 const canResetWhipEndpoint = computed(() => {
-  return stream.value.whipEndpoint !== stream.value.initialWhipEndpoint;
+  return currentEndpoint.value !== stream.value.initialWhipEndpoint;
+});
+const canPushWhipEndpoint = computed(() => {
+  return (
+    currentEndpoint.value.length > 0 &&
+    currentEndpoint.value !== endpoints.value[endpoints.value.length - 1]
+  );
+});
+const canPopWhipEndpoint = computed(() => {
+  return endpoints.value.length > 0;
 });
 
 const canStore = computed(() => {
@@ -38,9 +55,24 @@ const isStored = computed(() => {
 });
 
 onMounted(() => {
-  mousetrap.bind(BIND_KEYS_FOCUS_WHIP_ENDPOINT, () => {
+  mousetrap.bind(BIND_KEYS_WHIP_ENDPOINT_FOCUS, () => {
     if (whipEndpointInput.value) {
       whipEndpointInput.value.focus();
+    }
+  });
+  mousetrap.bind(BIND_KEYS_WHIP_ENDPOINT_STORE, () => {
+    if (canStore.value) {
+      storeWhipEndpoint();
+    }
+  });
+  mousetrap.bind(BIND_KEYS_WHIP_ENDPOINT_RESTORE, () => {
+    if (canRestoreWhipEndpoint.value) {
+      restoreWhipEndpoint();
+    }
+  });
+  mousetrap.bind(BIND_KEYS_WHIP_ENDPOINT_RESET, () => {
+    if (canResetWhipEndpoint.value) {
+      resetWhipEndpoint();
     }
   });
   if (!stream.value.whipEndpoint && canRestoreWhipEndpoint.value) {
@@ -48,10 +80,20 @@ onMounted(() => {
       restoreWhipEndpoint();
     }, 0);
   }
+  const es = localStorage.getItem(LS_KEY_WHIP_ENDPOINT_STACK);
+  if (es !== null) {
+    endpoints.value = es
+        ?.split("\n")
+        .map((e) => e.trim())
+        .filter((s) => s.length > 0) ?? [];
+  }
 });
 
 onBeforeUnmount(() => {
-  mousetrap.unbind(BIND_KEYS_FOCUS_WHIP_ENDPOINT);
+  mousetrap.unbind(BIND_KEYS_WHIP_ENDPOINT_FOCUS);
+  mousetrap.unbind(BIND_KEYS_WHIP_ENDPOINT_STORE);
+  mousetrap.unbind(BIND_KEYS_WHIP_ENDPOINT_RESTORE);
+  mousetrap.unbind(BIND_KEYS_WHIP_ENDPOINT_RESET);
 });
 
 watch(
@@ -88,6 +130,19 @@ function storeWhipEndpoint() {
 
 function restoreWhipEndpoint() {
   stream.value.whipEndpoint = storedEndpoint.value;
+}
+
+function pushWhipEndpoint() {
+  endpoints.value.push(currentEndpoint.value);
+  localStorage.setItem(LS_KEY_WHIP_ENDPOINT_STACK, endpoints.value.join("\n"));
+}
+
+function popWhipEndpoint() {
+  const next = endpoints.value.pop();
+  if (next) {
+    stream.value.whipEndpoint = next;
+    localStorage.setItem(LS_KEY_WHIP_ENDPOINT_STACK, endpoints.value.join("\n"));
+  }
 }
 </script>
 <template>
@@ -130,6 +185,24 @@ function restoreWhipEndpoint() {
           v-if="canResetWhipEndpoint"
         >
           Reset
+        </button>
+        <button
+          @click="pushWhipEndpoint"
+          class="text-slate-600 border rounded px-1 text-sm"
+          :class="{ 'bg-slate-100': !canPushWhipEndpoint, 'border-slate-400': !canPushWhipEndpoint }"
+          v-if="settings.godMode"
+          :disabled="!canPushWhipEndpoint"
+        >
+          Push
+        </button>
+        <button
+          @click="popWhipEndpoint"
+          class="text-slate-600 border rounded px-1 text-sm"
+          :class="{ 'bg-slate-100': !canPopWhipEndpoint, 'border-slate-400': !canPopWhipEndpoint }"
+          v-if="settings.godMode"
+          :disabled="!canPopWhipEndpoint"
+        >
+          Pop ({{ endpoints.length }})
         </button>
       </div>
     </div>
