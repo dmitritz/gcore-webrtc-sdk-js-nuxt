@@ -23,15 +23,17 @@ const KEYS_GODMODE = 'i d d q d'
 
 onMounted(() => {
   mousetrap.bind(KEYS_GODMODE, () => {
-    if (settings.godMode) {
-      return
-  }
-  settings.setGodMode(true)
-  godModeNotification.value = true
-  setTimeout(() => {
+    setGodMode()
+    godModeNotification.value = true
+    setTimeout(() => {
       godModeNotification.value = false
     }, 3000)
   })
+  const url = useRequestURL()
+  const godMode = url.searchParams.get('iddqd')
+  if (godMode !== null) {
+    setGodMode()
+  }
 })
 
 function report() {
@@ -40,6 +42,13 @@ function report() {
   setTimeout(() => {
     reported.value = false;
   }, 1000);
+}
+
+function setGodMode() {
+  if (settings.godMode) {
+    return
+  }
+  settings.setGodMode(true)
 }
 </script>
 
@@ -121,7 +130,10 @@ function report() {
         </p>
       </div>
     </footer>
-    <div v-if="godModeNotification" class="god-mode-notification fixed bottom-0 right-0 text-white py-3 px-6 uppercase text-xl font-bold">
+    <div
+      v-if="godModeNotification"
+      class="god-mode-notification fixed bottom-0 right-0 text-white py-3 px-6 uppercase text-xl font-bold"
+    >
       God mode
     </div>
   </div>

@@ -1,6 +1,6 @@
 import tailwindcss from "@tailwindcss/vite";
-import fetch from 'node-fetch'
-import consola from 'consola'
+import fetch from "node-fetch";
+import consola from "consola";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -11,18 +11,22 @@ export default defineNuxtConfig({
   hooks: {
     ready: async (nuxt) => {
       if (import.meta.env.VERCEL_WEBHOOK_URL) {
-        consola.info('Ready region:%s deployment:%s', import.meta.env.VERCEL_REGION, import.meta.env.VERCEL_DEPLOYMENT_ID)
+        consola.info(
+          "Ready region:%s deployment:%s",
+          import.meta.env.VERCEL_REGION,
+          import.meta.env.VERCEL_DEPLOYMENT_ID
+        );
         try {
           const response = await fetch(import.meta.env.VERCEL_WEBHOOK_URL, {
-            method: 'POST',
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
             body: import.meta.env.VERCEL_WEBHOOK_STARTUP_PAYLOAD,
-          })
-          consola.info('OK')
+          });
+          consola.info("OK");
         } catch (error) {
-          consola.error('ERROR %s', String(error))
+          consola.error("ERROR %s", String(error));
         }
       }
     },
@@ -44,5 +48,5 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
 
-  modules: ['@pinia/nuxt'],
+  modules: ["@pinia/nuxt", "@nuxt/test-utils/module"],
 });

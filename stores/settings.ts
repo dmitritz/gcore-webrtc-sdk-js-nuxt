@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import type { IceTransportPolicy } from "~/types";
 
-type State = {
+export type State = {
   iceTransportPolicy: IceTransportPolicy;
   preferTcp: boolean;
   videoCodecs: string[];
@@ -9,6 +9,14 @@ type State = {
   iceHostCandidates: boolean;
   godMode: boolean; // enables additional low-level control elements in the UI
   replication: number;
+  loadProfile: LoadProfile;
+};
+
+export type LoadProfile = {
+  delay: string;
+  variance: number;
+  batchSize: number;
+  batchWindow: string;
 };
 
 type Actions = {
@@ -19,6 +27,7 @@ type Actions = {
   setGodMode: (godMode: boolean) => void;
   setIceHostCandidates: (iceHostCandidates: boolean) => void;
   setReplication: (replication: number) => void;
+  setLoadProfile: (loadProfile: Partial<LoadProfile>) => void;
 };
 
 const DEFAULT_SETTINGS = {
@@ -29,6 +38,12 @@ const DEFAULT_SETTINGS = {
   iceHostCandidates: false,
   godMode: false,
   replication: 3,
+  loadProfile: {
+    delay: '250ms',
+    variance: 0.5,
+    batchSize: 10,
+    batchWindow: '30s'
+  },
 };
 
 export const useSettingsStore = defineStore<"settings", State, {}, Actions>(
@@ -59,7 +74,13 @@ export const useSettingsStore = defineStore<"settings", State, {}, Actions>(
       setReplication(replication: number) {
         if (replication > 0) {
           this.replication = replication;
+        } else {
+          console.warn(`Invalid replication value: ${replication}. Clamping to minimum value of 1.`);
+          this.replication = 1;
         }
+      },
+      setLoadProfile(loadProfile: Partial<LoadProfile>) {
+        this.loadProfile = { ...this.loadProfile, ...loadProfile };
       },
     },
   }

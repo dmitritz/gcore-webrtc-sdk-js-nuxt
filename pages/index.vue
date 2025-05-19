@@ -131,7 +131,7 @@ onMounted(() => {
     mediaDevices.value.micDevicesList.length
       ? Status.Ready
       : Status.ConnectingDevices;
-  // TODO check ready status
+  // TODO check that ready status isn't shown until and unless the devices are actually connected
   startUserMedia();
 });
 
@@ -191,6 +191,10 @@ function start() {
       }),
       new StreamMeta({
         amp_times: settings.replication,
+        amp_delay: settings.loadProfile.delay,
+        amp_var: settings.loadProfile.variance,
+        amp_batch: settings.loadProfile.batchSize,
+        amp_batchw: settings.loadProfile.batchWindow,
       }),
       new VideoResolutionChangeDetector(({ degraded, height }) => {
         videoQuality.value = height;
