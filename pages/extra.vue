@@ -3,10 +3,11 @@
     <nuxt-layout>
       <h2 class="text-xl font-semibold mb-4">Extra</h2>
       <div class="grid grid-cols-3 gap-4 mb-4">
-        <label class="flex items-center gap-2">
+        <label class="flex items-center gap-2" for="can_trickle_ice">
           <input
             type="checkbox"
             :checked="settings.canTrickleIce"
+            id="can_trickle_ice"
             @change="
               settings.setCanTrickleIce(
                 !!($event.target as HTMLInputElement)?.checked
@@ -15,10 +16,11 @@
           />
           Can trickle ICE
         </label>
-        <label class="flex items-center gap-2">
+        <label class="flex items-center gap-2" for="ice_relay_only">
           <input
             type="checkbox"
             :checked="settings.iceTransportPolicy === 'relay'"
+            id="ice_relay_only"
             @change="
               settings.setIceTransportPolicy(
                 !!($event.target as HTMLInputElement)?.checked ? 'relay' : 'all'
@@ -27,10 +29,11 @@
           />
           ICE relay only
         </label>
-        <label class="flex items-center gap-2">
+        <label class="flex items-center gap-2" for="ice_host_candidates">
           <input
             type="checkbox"
             :checked="settings.iceHostCandidates"
+            id="ice_host_candidates"
             @change="
               settings.setIceHostCandidates(
                 !!($event.target as HTMLInputElement)?.checked
@@ -39,10 +42,11 @@
           />
           ICE host candidates
         </label>
-        <label class="flex items-center gap-2">
+        <label class="flex items-center gap-2" for="prefer_tcp">
           <input
             type="checkbox"
             :checked="settings.preferTcp"
+            id="prefer_tcp"
             @change="
               settings.setPreferTcp(
                 !!($event.target as HTMLInputElement)?.checked
@@ -52,10 +56,13 @@
           Prefer TCP
         </label>
       </div>
-      <div class="grid gap-4 grid-cols-4 items-center content-center">
+      <div class="grid gap-4 grid-cols-4 items-start content-start">
         <div class="col-span-4 font-semibold mb-4">Profile</div>
         <div>
           <label for="replication" class="font-semibold">Replication</label>
+          <span class="text-sm text-slate-500">
+            of an ingress connection on the relay to the upstream
+          </span>
         </div>
         <div
           class="flex items-center gap-2 justify-start basis-full shrink-0 grow col-span-3"
@@ -75,6 +82,9 @@
         </div>
         <div>
           <label for="load_profile_delay" class="font-semibold">Delay</label>
+          <span class="text-sm text-slate-500">
+            before creating next upstream connection
+          </span>
         </div>
         <div
           class="flex items-center gap-2 justify-start basis-full shrink-0 grow col-span-3"
@@ -96,6 +106,9 @@
           <label for="load_profile_variance" class="font-semibold"
             >Variance</label
           >
+          <span class="text-sm text-slate-500">
+            of the next connection delay. 0 - constant delay = base delay, 1.0 - delay is between 0 and 2x the base delay
+          </span>
         </div>
         <div
           class="flex items-center gap-2 justify-start basis-full shrink-0 grow col-span-3"
@@ -115,6 +128,11 @@
           <label for="load_profile_batch_size" class="font-semibold"
             >Batch size</label
           >
+          <span class="text-sm text-slate-500">
+            of connections within a time window.
+            When the number of connections reaches the limit, the next connection will wait until the batch window is over.
+            0 - disabled.
+          </span>
         </div>
         <div
           class="flex items-center gap-2 justify-start basis-full shrink-0 grow col-span-3"
@@ -134,6 +152,9 @@
           <label for="load_profile_batch_window" class="font-semibold"
             >Batch window</label
           >
+          <span class="text-sm text-slate-500">
+            for a <code>batch size</code>batch number of connections. 0 - disabled.
+          </span>
         </div>
         <div
           class="flex items-center gap-2 justify-start basis-full shrink-0 grow col-span-3"
