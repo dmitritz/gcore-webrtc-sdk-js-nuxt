@@ -153,7 +153,7 @@
             >Batch window</label
           >
           <span class="text-sm text-slate-500">
-            for a <code>batch size</code>batch number of connections. 0 - disabled.
+            for a <code>batch size</code> batch number of connections. 0 - disabled.
           </span>
         </div>
         <div
