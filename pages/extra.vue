@@ -83,7 +83,7 @@
         <div>
           <label for="load_profile_delay" class="font-semibold">Delay</label>
           <span class="text-sm text-slate-500">
-            before creating next upstream connection
+            before creating the next upstream connection
           </span>
         </div>
         <div
