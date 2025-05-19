@@ -5,8 +5,6 @@ export type StreamInfoWithInitialValues = StreamInfo & {
 
 import type { StreamInfo } from "~/types/stream";
 
-const STREAM_NAME = "My damn awesome WebRTC stream";
-
 export default function useStream(): Ref<StreamInfoWithInitialValues> {
   return useState<StreamInfoWithInitialValues>("stream", function () {
     const url = useRequestURL();
