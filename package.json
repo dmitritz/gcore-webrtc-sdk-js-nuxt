@@ -2,7 +2,7 @@
   "name": "gcore-webrtc-ingest-demo-vercel",
   "private": true,
   "type": "module",
-  "version": "0.7.11",
+  "version": "0.8.1",
   "scripts": {
     "build": "VITE_SENTRY_BUILD_ID=$VERCEL_GIT_COMMIT_SHA nuxt build",
     "dev": "nuxt dev",
@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^4.5.1",
-    "@gcorevideo/player": "^2.20.3",
+    "@gcorevideo/player": "^2.26.8",
     "@gcorevideo/rtckit": "^0.89.17",
     "@gcorevideo/rtckit-node": "^0.14.1",
     "@gcorevideo/utils": "^0.6.0",
