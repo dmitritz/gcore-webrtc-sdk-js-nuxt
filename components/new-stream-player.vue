@@ -38,6 +38,7 @@ onMounted(() => {
         hlsjsConfig: tuneHls.value ? {
           liveSyncDurationCount: 0,
           liveMaxLatencyDurationCount: 1,
+          maxLiveSyncPlaybackRate: 2,
           lowLatencyMode: true,
         } : {
           lowLatencyMode: true,
