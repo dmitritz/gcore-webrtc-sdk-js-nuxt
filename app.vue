@@ -6,7 +6,6 @@ import { setTracer } from "@gcorevideo/rtckit";
 import { setTracer as setTracerPlayer, version as playerVersion } from "@gcorevideo/player";
 import { LogTracer, Logger, RemoteTracer, SentryTracer } from "@gcorevideo/utils";
 import * as Sentry from '@sentry/browser'
-import Fingerprint from '@fingerprintjs/fingerprintjs'
 import mousetrap from 'mousetrap'
 
 const $route = useRoute()
@@ -52,12 +51,6 @@ if (import.meta.client) {
     setTracer(tracer)
     setTracerPlayer(tracer)
   if (client) {
-    Fingerprint.load()
-      .then((agent) => agent.get())
-      .then((res) => {
-        tracer.setTag('visitor_id', res.visitorId)
-        Sentry.getGlobalScope().setTag('visitor_id', res.visitorId)
-      })
   } else {
     console.log('Sentry client is not initialized')
     Logger.enable(import.meta.env.VITE_DEBUG ?? '*')

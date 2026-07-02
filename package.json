@@ -12,7 +12,6 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@fingerprintjs/fingerprintjs": "^4.5.1",
     "@gcorevideo/player": "^2.26.8",
     "@gcorevideo/rtckit": "^0.89.17",
     "@gcorevideo/rtckit-node": "^0.14.1",
@@ -35,7 +34,7 @@
     "@types/mousetrap": "^1.6.15",
     "@types/ms": "^2.1.0",
     "@vue/test-utils": "^2.4.6",
-    "happy-dom": "^17.4.7",
+    "happy-dom": "^20.9.0",
     "node-fetch": "^3.3.2",
     "vitest": "^3.1.3"
   }
