@@ -10,6 +10,5 @@ updates:
     target-branch: "develop"
     assignees:
       - dmitritz
-      - apih9000
     schedule:
       interval: "weekly"
