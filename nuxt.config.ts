@@ -49,4 +49,8 @@ export default defineNuxtConfig({
   },
 
   modules: ["@pinia/nuxt", "@nuxt/test-utils/module"],
+
+  experimental: {
+    viteEnvironmentApi: true,
+  },
 });

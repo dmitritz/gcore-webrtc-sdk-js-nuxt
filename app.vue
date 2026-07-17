@@ -75,7 +75,8 @@ if (import.meta.client) {
   }
 }
 
-useStreamSetup()
+// If enabled, will require a valid Gcore API key
+// useStreamSetup()
 </script>
 
 <template>
