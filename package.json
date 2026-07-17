@@ -19,7 +19,6 @@
     "@heroicons/vue": "^2.1.5",
     "@pinia/nuxt": "^1.0.1",
     "@sentry/browser": "^10.66.0",
-    "@sentry/vue": "^9.15.0",
     "consola": "^3.4.0",
     "mousetrap": "^1.6.5",
     "ms": "^2.1.3",
