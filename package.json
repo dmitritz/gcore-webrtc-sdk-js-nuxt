@@ -12,7 +12,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@gcorevideo/player": "^2.26.8",
+    "@gcorevideo/player": "^2.30.10",
     "@gcorevideo/rtckit": "^0.89.28",
     "@gcorevideo/rtckit-node": "^0.14.1",
     "@gcorevideo/utils": "^0.6.0",
