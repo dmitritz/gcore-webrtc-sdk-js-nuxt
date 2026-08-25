@@ -38,6 +38,6 @@
     "vitest": "^4.1.10"
   },
   "optionalDependencies": {
-    "@rolldown/binding-android-arm64": "^1.2.4"
+    "@rolldown/binding-android-arm64": "^1.2.5"
   }
 }
