@@ -33,7 +33,7 @@
     "@types/mousetrap": "^1.6.15",
     "@types/ms": "^2.1.0",
     "@vue/test-utils": "^2.4.6",
-    "happy-dom": "^20.11.2",
+    "happy-dom": "^20.11.15",
     "node-fetch": "^3.3.2",
     "vitest": "^4.1.10"
   },
