@@ -17,7 +17,7 @@
     "@gcorevideo/rtckit-node": "^0.14.1",
     "@gcorevideo/utils": "^0.7.1",
     "@heroicons/vue": "^2.1.5",
-    "@pinia/nuxt": "^1.0.1",
+    "@pinia/nuxt": "^1.0.2",
     "@sentry/browser": "^10.70.0",
     "consola": "^3.4.0",
     "mousetrap": "^1.6.5",
@@ -28,16 +28,16 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@nuxt/test-utils": "^4.1.0",
+    "@nuxt/test-utils": "^4.2.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/mousetrap": "^1.6.15",
     "@types/ms": "^2.1.0",
     "@vue/test-utils": "^2.4.6",
-    "happy-dom": "^20.11.2",
+    "happy-dom": "^20.11.15",
     "node-fetch": "^3.3.2",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   },
   "optionalDependencies": {
-    "@rolldown/binding-android-arm64": "^1.2.4"
+    "@rolldown/binding-android-arm64": "^1.2.6"
   }
 }
