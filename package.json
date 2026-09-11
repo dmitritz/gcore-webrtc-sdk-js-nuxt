@@ -12,8 +12,8 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@gcorevideo/player": "^2.30.10",
-    "@gcorevideo/rtckit": "^0.89.29",
+    "@gcorevideo/player": "^2.30.12",
+    "@gcorevideo/rtckit": "^0.89.30",
     "@gcorevideo/rtckit-node": "^0.14.1",
     "@gcorevideo/utils": "^0.7.1",
     "@heroicons/vue": "^2.1.5",
