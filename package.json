@@ -18,7 +18,7 @@
     "@gcorevideo/utils": "^0.7.1",
     "@heroicons/vue": "^2.1.5",
     "@pinia/nuxt": "^1.0.2",
-    "@sentry/browser": "^10.70.0",
+    "@sentry/browser": "^11.0.0",
     "consola": "^3.4.0",
     "mousetrap": "^1.6.5",
     "ms": "^2.1.3",
