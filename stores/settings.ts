@@ -34,7 +34,7 @@ const DEFAULT_SETTINGS = {
   iceTransportPolicy: "relay" as IceTransportPolicy,
   preferTcp: true,
   videoCodecs: ["H264"],
-  canTrickleIce: true,
+  canTrickleIce: false,
   iceHostCandidates: false,
   godMode: false,
   replication: 3,

@@ -4,6 +4,9 @@ import {
   NetworkError,
   ServerRequestError,
   StreamMeta,
+  StreamProfileEvent,
+  StreamProfileEventType,
+  StreamProfiler,
   VideoResolutionChangeDetector,
   WebrtcStreamingEvents,
   WhipClientEvents,
@@ -94,14 +97,14 @@ const selectedMic = computed(
   () =>
     mediaDevices.value.micDeviceId &&
     mediaDevices.value.micDevicesList.find(
-      (d) => d.deviceId === mediaDevices.value.micDeviceId
-    )?.label
+      (d) => d.deviceId === mediaDevices.value.micDeviceId,
+    )?.label,
 );
 
 const started = computed(() => air.value.live || air.value.ended);
 
 const canStart = computed(
-  () => !!userMedia.value.videoTrack && !started.value && !air.value.starting
+  () => !!userMedia.value.videoTrack && !started.value && !air.value.starting,
 );
 
 const canRestart = computed(() => air.value.ended);
@@ -135,6 +138,16 @@ onMounted(() => {
   startUserMedia();
 });
 
+function formatDelta(delta: number): string | undefined {
+  if (delta < 1000) {
+    return `${delta.toFixed(0)}ms`;
+  }
+  if (delta < 10000) {
+    return `${(delta / 1000).toFixed(1)}s`;
+  }
+  return `${(delta / 1000).toFixed(0)}s`;
+}
+
 onBeforeUnmount(() => {
   mousetrap.unbind(BIND_KEYS_START);
   mousetrap.unbind(BIND_KEYS_LEAVE);
@@ -164,7 +177,7 @@ watch(
     ) {
       status.value = Status.Ready;
     }
-  }
+  },
 );
 
 function start() {
@@ -207,6 +220,18 @@ function start() {
               : QualityStatus.Normal;
         }
       }),
+      new StreamProfiler(
+        (() => {
+          let lastTimestamp: DOMHighResTimeStamp = 0;
+          return (event: StreamProfileEvent) => {
+            trace(`${T} StreamProfileEvent`, {
+              ...event,
+              delta: formatDelta(event.delta),
+            });
+            lastTimestamp = event.timestamp;
+          };
+        })(),
+      ),
     ],
     videoCodecs: ["H264"], // TODO settings
   });

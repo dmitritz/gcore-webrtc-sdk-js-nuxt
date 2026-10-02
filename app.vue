@@ -4,7 +4,7 @@ import rtckitNode from '@gcorevideo/rtckit-node/package.json' with { type: 'json
 import pkg from './package.json' with { type: 'json' }
 import { setTracer } from "@gcorevideo/rtckit";
 import { setTracer as setTracerPlayer, version as playerVersion } from "@gcorevideo/player";
-import { LogTracer, Logger, RemoteTracer, SentryTracer } from "@gcorevideo/utils";
+import { ChainedTracer, LogTracer, Logger, RemoteTracer, SentryTracer, setTracer as setTracerUtils } from "@gcorevideo/utils";
 import * as Sentry from '@sentry/browser'
 import mousetrap from 'mousetrap'
 
@@ -34,8 +34,9 @@ if (import.meta.client) {
     release: pkg.version,
     tracesSampleRate: 1.0,
   }) : null
-  const baseTracer = client ? new SentryTracer(client as any, Sentry.getGlobalScope() as any) : new LogTracer(pkg.name)
-  const tracer = new RemoteTracer(baseTracer, {
+  const tracers: Tracer[] = [
+    client ? new SentryTracer(client as any, Sentry.getGlobalScope() as any) : new LogTracer(pkg.name),
+    new RemoteTracer(undefined, {
       // device: Browser.device?.replace(/ /g, '_'),
       // browser: Browser.name,
       // browser_ver: Browser.version,
@@ -48,8 +49,11 @@ if (import.meta.client) {
       // width: Browser.viewport.width,
       // height: Browser.viewport.height,
     })
-    setTracer(tracer)
-    setTracerPlayer(tracer)
+  ]
+  const tracer = new ChainedTracer(tracers)
+  setTracer(tracer)
+  setTracerPlayer(tracer)
+  setTracerUtils(tracer)
   if (client) {
   } else {
     console.log('Sentry client is not initialized')
