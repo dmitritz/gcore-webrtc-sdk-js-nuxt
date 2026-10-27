@@ -17,7 +17,7 @@
     "@gcorevideo/rtckit-node": "^0.14.1",
     "@gcorevideo/utils": "^0.7.4",
     "@heroicons/vue": "^2.1.5",
-    "@pinia/nuxt": "^1.0.2",
+    "@pinia/nuxt": "^1.0.3",
     "@sentry/browser": "^11.4.0",
     "consola": "^3.4.0",
     "mousetrap": "^1.6.5",
