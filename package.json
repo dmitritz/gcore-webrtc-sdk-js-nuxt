@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@nuxt/test-utils": "^4.3.4",
-    "@tailwindcss/vite": "^4.3.3",
+    "@tailwindcss/vite": "^4.3.5",
     "@types/mousetrap": "^1.6.15",
     "@types/ms": "^2.1.0",
     "@vue/test-utils": "^2.5.1",
