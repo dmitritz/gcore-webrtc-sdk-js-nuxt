@@ -28,7 +28,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@nuxt/test-utils": "^4.3.4",
+    "@nuxt/test-utils": "^4.4.0",
     "@tailwindcss/vite": "^4.3.5",
     "@types/mousetrap": "^1.6.15",
     "@types/ms": "^2.1.0",
